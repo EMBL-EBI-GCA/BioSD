@@ -17,6 +17,23 @@
 
 =cut
 
+=pod
+
+=head1 NAME
+
+    BioSD::Sample
+
+=head1 SYNOPSIS
+
+    my $sample = BioSD::Sample->new('SAME123456');
+
+=head1 Description
+
+    A BioSD::Sample object represents all data held for a sample in the
+    BioSamples database
+
+=cut
+
 package BioSD::Sample;
 use strict;
 use warnings;
