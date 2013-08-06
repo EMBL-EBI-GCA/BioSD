@@ -17,11 +17,9 @@
 
 =cut
 
-package BioSD::Property;
+package BioSD::Publication;
 use strict;
 use warnings;
-
-use BioSD::TermSourceREF;
 
 sub new{
   my ($class, $xml_element) = @_;
@@ -32,46 +30,16 @@ sub new{
   return $self;
 }
 
-
-sub value {
+sub doi {
   my ($self) = @_;
-  my ($value) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Value');
-  return $value;
+  my ($doi) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('DOI');
+  return $doi;
 }
 
-sub unit {
+sub pubmed_id {
   my ($self) = @_;
-  my ($unit) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Unit');
-  return $unit;
-}
-
-sub term_source_ref {
-  my ($self) = @_;
-  if (!$self->{_term_source_ref}) {
-    ($self->{_term_source_ref}) = map {BioSD::TermSourceREF->new($_)}
-              $self->_xml_element->getChildrenByTagName('TermSourceREF');
-  }
-  return $self->{_term_source_ref};
-}
-
-sub comment {
-  my ($self) = @_;
-  return $self->_xml_element->getAttribute('comment');
-}
-
-sub class {
-  my ($self) = @_;
-  return $self->_xml_element->getAttribute('class');
-}
-
-sub type {
-  my ($self) = @_;
-  return $self->_xml_element->getAttribute('type');
-}
-
-sub characteristic {
-  my ($self) = @_;
-  return $self->_xml_element->getAttribute('characteristic');
+  my ($pubmed_id) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('PubMedID');
+  return $pubmed_id;
 }
 
 sub _xml_element {
@@ -81,5 +49,6 @@ sub _xml_element {
   }
   return $self->{_xml_element};
 }
+
 
 1;

@@ -56,39 +56,23 @@ sub is_valid {
   return 0;
 }
 
-sub database {
+sub annotations {
   my ($self) = @_;
   my $group_xml_element = $self->_xml_element;
-  die 'No database for invalid Sample Group with id ' . $self->id if !$group_xml_element;
-  if (!$self->{_database}) {
-    ($self->{_database}) = map {BioSD::Database->new($_)}
-              $group_xml_element->getChildrenByTagName('Database');
-  }
-  return $self->{_database};
+  die 'No attributes for invalid Sample Group with id ' . $self->id if !$group_xml_element;
+  $self->{_attributes} //= [map {BioSD::Attribute->new($_)}
+            $group_xml_element->getChildrenByTagName('Attribute')];
+  return $self->{_attributes};
 }
 
-sub organization {
+sub term_sources {
   my ($self) = @_;
   my $group_xml_element = $self->_xml_element;
-  die 'No organization for invalid Sample Group with id ' . $self->id if !$group_xml_element;
-  if (!$self->{_organization}) {
-    ($self->{_organization}) = map {BioSD::Organization->new($_)}
-              $group_xml_element->getChildrenByTagName('Organization');
-  }
-  return $self->{_organization};
+  die 'No term_sources for invalid Sample Group with id ' . $self->id if !$group_xml_element;
+  $self->{_term_sources} //= [map {BioSD::TermSourceREF->new($_)}
+            $group_xml_element->getChildrenByTagName('TermSource')];
+  return $self->{_term_sources};
 }
-
-sub term_source {
-  my ($self) = @_;
-  my $group_xml_element = $self->_xml_element;
-  die 'No term_source for invalid Sample Group with id ' . $self->id if !$group_xml_element;
-  if (!$self->{_term_source}) {
-    ($self->{_term_source}) = map {BioSD::TermSourceREF->new($_)}
-              $group_xml_element->getChildrenByTagName('TermSource');
-  }
-  return $self->{_term_source};
-}
-
 
 sub properties {
   my ($self) = @_;
@@ -98,6 +82,43 @@ sub properties {
             $group_xml_element->getChildrenByTagName('Property')];
   return $self->{_properties};
 }
+
+sub organizations {
+  my ($self) = @_;
+  my $group_xml_element = $self->_xml_element;
+  die 'No organizations for invalid Sample Group with id ' . $self->id if !$group_xml_element;
+  $self->{_organizations} //= [map {BioSD::Organization->new($_)}
+            $group_xml_element->getChildrenByTagName('Organization')];
+  return $self->{_organizations};
+}
+
+sub people {
+  my ($self) = @_;
+  my $group_xml_element = $self->_xml_element;
+  die 'No people for invalid Sample Group with id ' . $self->id if !$group_xml_element;
+  $self->{_people} //= [map {BioSD::TermSourceREF->new($_)}
+            $group_xml_element->getChildrenByTagName('Person')];
+  return $self->{_people};
+}
+
+sub databases {
+  my ($self) = @_;
+  my $group_xml_element = $self->_xml_element;
+  die 'No databases for invalid Sample Group with id ' . $self->id if !$group_xml_element;
+  $self->{_databases} //= [map {BioSD::Database->new($_)}
+            $group_xml_element->getChildrenByTagName('Database')];
+  return $self->{_databases};
+}
+
+sub publications {
+  my ($self) = @_;
+  my $group_xml_element = $self->_xml_element;
+  die 'No publications for invalid Sample Group with id ' . $self->id if !$group_xml_element;
+  $self->{_publications} //= [map {BioSD::TermSourceREF->new($_)}
+            $group_xml_element->getChildrenByTagName('Publication')];
+  return $self->{_publications};
+}
+
 
 sub property {
   my ($self, $class) = @_;

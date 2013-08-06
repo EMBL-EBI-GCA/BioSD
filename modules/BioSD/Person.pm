@@ -17,11 +17,9 @@
 
 =cut
 
-package BioSD::Property;
+package BioSD::Person;
 use strict;
 use warnings;
-
-use BioSD::TermSourceREF;
 
 sub new{
   my ($class, $xml_element) = @_;
@@ -33,45 +31,34 @@ sub new{
 }
 
 
-sub value {
+sub first_name {
   my ($self) = @_;
-  my ($value) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Value');
-  return $value;
+  my ($first_name) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('FirstName');
+  return $first_name;
 }
 
-sub unit {
+sub last_name {
   my ($self) = @_;
-  my ($unit) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Unit');
-  return $unit;
+  my ($last_name) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('LastName');
+  return $last_name;
 }
 
-sub term_source_ref {
+sub mid_initials {
   my ($self) = @_;
-  if (!$self->{_term_source_ref}) {
-    ($self->{_term_source_ref}) = map {BioSD::TermSourceREF->new($_)}
-              $self->_xml_element->getChildrenByTagName('TermSourceREF');
-  }
-  return $self->{_term_source_ref};
+  my ($mid_initials) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('MidInitials');
+  return $mid_initials;
 }
 
-sub comment {
+sub email {
   my ($self) = @_;
-  return $self->_xml_element->getAttribute('comment');
+  my ($email) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Email');
+  return $email;
 }
 
-sub class {
+sub role {
   my ($self) = @_;
-  return $self->_xml_element->getAttribute('class');
-}
-
-sub type {
-  my ($self) = @_;
-  return $self->_xml_element->getAttribute('type');
-}
-
-sub characteristic {
-  my ($self) = @_;
-  return $self->_xml_element->getAttribute('characteristic');
+  my ($role) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Role');
+  return $role;
 }
 
 sub _xml_element {
@@ -81,5 +68,6 @@ sub _xml_element {
   }
   return $self->{_xml_element};
 }
+
 
 1;

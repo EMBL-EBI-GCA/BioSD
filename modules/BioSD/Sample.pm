@@ -70,13 +70,50 @@ sub is_valid {
   return 0;
 }
 
+sub annotations {
+  my ($self) = @_;
+  my $sample_xml_element = $self->_xml_element;
+  die 'No annotations for invalid Sample with id ' . $self->id if !$sample_xml_element;
+  $self->{_annotations} //= [map {BioSD::Annotation->new($_)}
+            $self->_xml_element->getChildrenByTagName('Annotation')];
+  return $self->{_annotations};
+}
+
 sub properties {
   my ($self) = @_;
   my $sample_xml_element = $self->_xml_element;
   die 'No properties for invalid Sample with id ' . $self->id if !$sample_xml_element;
-  $self->_properties //= [map {BioSD::Property->new($_)}
+  $self->{_properties} //= [map {BioSD::Property->new($_)}
             $self->_xml_element->getChildrenByTagName('Property')];
   return $self->{_properties};
+}
+
+sub derived_from {
+  my ($self) = @_;
+  my $sample_xml_element = $self->_xml_element;
+  die 'No derived from for invalid Sample with id ' . $self->id if !$sample_xml_element;
+  $self->{_derived_from} //= [map {BioSD::Sample->new($_->to_literal)}
+            $self->_xml_element->getChildrenByTagName('derivedFrom')];
+  return $self->{_derived_from};
+}
+
+sub derivatives {
+  my ($self) = @_;
+  my $sample_xml_element = $self->_xml_element;
+  die 'No derivatives for invalid Sample with id ' . $self->id if !$sample_xml_element;
+  if !($self->{_derivatives}) {
+    my @derivatives;
+    my $self_id = $self->id;
+    foreach my $group (map {BioSD::Group->new($_)} @{BioSD::Adaptor::query_groups($self_id)}) {
+      SAMPLE:
+      foreach my $sample (@{BioSD::Adaptor::query_samples($group->id, $self_id)}) {
+        next SAMPLE if ! grep {$self_id eq $_->id} @{$sample->derived_from};
+        push(@derivatives, $sample);
+      }
+    }
+    $self->{_derivatives} = \@derivatives;
+  }
+  return $self->{_derivatives};
 }
 
 sub property {
@@ -86,7 +123,16 @@ sub property {
 
 sub groups {
   my ($self) = @_;
-  $self->{_groups} //= [map {BioSD::Group->new($_)} @{BioSD::Adaptor::query_groups($self->id)}];
+  if (! $self->{_groups}) {
+    my @groups;
+    my $self_id = $self->id;
+    foreach my $group (map {BioSD::Group->new($_)} @{BioSD::Adaptor::query_groups($self_id)}) {
+      if (grep {$_->id eq $self_id} @{$group->samples}) {
+        push(@groups, $group);
+      }
+    }
+    $self->{_groups} = \@groups;
+  }
   return $self->{_groups};
 }
 

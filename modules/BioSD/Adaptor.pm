@@ -103,3 +103,4 @@ sub query_groups {
   }
   return \@group_ids;
 }
+

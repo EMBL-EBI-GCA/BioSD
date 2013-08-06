@@ -17,11 +17,9 @@
 
 =cut
 
-package BioSD::Property;
+package BioSD::Attribute;
 use strict;
 use warnings;
-
-use BioSD::TermSourceREF;
 
 sub new{
   my ($class, $xml_element) = @_;
@@ -32,36 +30,9 @@ sub new{
   return $self;
 }
 
-
-sub value {
+sub to_string {
   my ($self) = @_;
-  my ($value) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Value');
-  return $value;
-}
-
-sub unit {
-  my ($self) = @_;
-  my ($unit) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Unit');
-  return $unit;
-}
-
-sub term_source_ref {
-  my ($self) = @_;
-  if (!$self->{_term_source_ref}) {
-    ($self->{_term_source_ref}) = map {BioSD::TermSourceREF->new($_)}
-              $self->_xml_element->getChildrenByTagName('TermSourceREF');
-  }
-  return $self->{_term_source_ref};
-}
-
-sub comment {
-  my ($self) = @_;
-  return $self->_xml_element->getAttribute('comment');
-}
-
-sub class {
-  my ($self) = @_;
-  return $self->_xml_element->getAttribute('class');
+  return $self->_xml_element->to_literal;
 }
 
 sub type {
@@ -69,10 +40,6 @@ sub type {
   return $self->_xml_element->getAttribute('type');
 }
 
-sub characteristic {
-  my ($self) = @_;
-  return $self->_xml_element->getAttribute('characteristic');
-}
 
 sub _xml_element {
   my ($self, $xml_element) = @_;
@@ -81,5 +48,6 @@ sub _xml_element {
   }
   return $self->{_xml_element};
 }
+
 
 1;
