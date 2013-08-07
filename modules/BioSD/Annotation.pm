@@ -17,7 +17,7 @@
 
 =cut
 
-package BioSD::Attribute;
+package BioSD::Annotation;
 use strict;
 use warnings;
 

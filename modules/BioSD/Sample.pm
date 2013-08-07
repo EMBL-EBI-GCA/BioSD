@@ -27,6 +27,25 @@
 
     my $sample = BioSD::Sample->new('SAME123456');
 
+    # check we have used a valid sample id
+    if ($sample->is_valid) {
+      print 'BioSamples database contains a sample with id SAME123456';
+    }
+
+    # get some information about the sample
+    my $properties = $sample->properties; 
+    my $age = $sample->property('age')->value;
+    my $annotations = $sample->annotations;
+
+    # find groups containing the sample
+    my $groups = $sample->groups;
+
+    # find which samples it was derived from
+    my $ancestors = $sample->derived_from;
+
+    # find which samples were derived from it
+    my $descendents = $sample->derivatives;
+
 =head1 Description
 
     A BioSD::Sample object represents all data held for a sample in the
@@ -40,9 +59,27 @@ use warnings;
 
 use BioSD::Property;
 use BioSD::Adaptor;
-use BioSD::Group;
+require BioSD::Group;
 
 my %cache;
+
+=head new
+
+  Arg [1]    : A sample_id for the BioSamples database e.g. 'SAME123456'
+  Example    : $sample = BioSD::Sample->new('SAME123456');
+  Description: Creates a new sample object.  A sample object will be created for
+               any id, without initially checking if that id is present in the
+               BioSamples database.  If the id is not valid, errors will be
+               thrown later when trying to access details of the sample e.g.
+               $sample->properties
+
+               Samples are automatically cached to avoid repetitive queries to
+               the BioSamples database 
+
+  Returntype : BioSD::Sample
+  Exceptions : throws if the BioSamples id is not specified
+
+=cut
 
 sub new{
   my ($class, $id) = @_;
@@ -101,7 +138,7 @@ sub derivatives {
   my ($self) = @_;
   my $sample_xml_element = $self->_xml_element;
   die 'No derivatives for invalid Sample with id ' . $self->id if !$sample_xml_element;
-  if !($self->{_derivatives}) {
+  if (!$self->{_derivatives}) {
     my @derivatives;
     my $self_id = $self->id;
     foreach my $group (map {BioSD::Group->new($_)} @{BioSD::Adaptor::query_groups($self_id)}) {

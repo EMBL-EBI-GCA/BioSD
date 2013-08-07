@@ -22,7 +22,7 @@ package BioSD::Group;
 use strict;
 use warnings;
 
-use BioSD::Sample;
+require BioSD::Sample;
 use BioSD::Adaptor;
 use BioSD::Property;
 use BioSD::TermSourceREF;
