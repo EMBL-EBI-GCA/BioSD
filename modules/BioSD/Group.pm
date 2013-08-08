@@ -177,7 +177,7 @@ sub properties {
   my ($self) = @_;
   my $group_xml_element = $self->_xml_element;
   die 'No properties for invalid Sample Group with id ' . $self->id if !$group_xml_element;
-  $self->_properties //= [map {BioSD::Property->_new($_)}
+  $self->{_properties} //= [map {BioSD::Property->_new($_)}
             $group_xml_element->getChildrenByTagName('Property')];
   return $self->{_properties};
 }

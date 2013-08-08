@@ -33,8 +33,6 @@
 
 package BioSD::Adaptor;
 
-use LWP::UserAgent;
-use XML::LibXML;
 require BioSD;
 use strict;
 use warnings;

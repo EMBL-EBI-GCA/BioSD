@@ -44,6 +44,10 @@
 package BioSD;
 use strict;
 use warnings;
+
+use LWP::UserAgent;
+use XML::LibXML;
+
 require BioSD::Adaptor;
 require BioSD::Annotation;
 require BioSD::Database;
