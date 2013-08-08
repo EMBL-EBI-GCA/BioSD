@@ -47,7 +47,7 @@ package BioSD::Property;
 use strict;
 use warnings;
 
-use BioSD::TermSource;
+require BioSD;
 
 =head value
 

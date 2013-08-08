@@ -24,7 +24,7 @@
 =head1 SYNOPSIS
 
     # fetch a person from a valid Group object
-    my ($person) = $group->people();
+    my ($person) = @{$group->people()};
 
     # get some information about the organization
     my $first_name = $person->first_name(); 

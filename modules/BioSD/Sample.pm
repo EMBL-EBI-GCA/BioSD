@@ -57,9 +57,7 @@ package BioSD::Sample;
 use strict;
 use warnings;
 
-use BioSD::Property;
-use BioSD::Adaptor;
-require BioSD::Group;
+require BioSD;
 
 my %cache;
 
@@ -207,9 +205,11 @@ sub derivatives {
   if (!$self->{_derivatives}) {
     my @derivatives;
     my $self_id = $self->id;
-    foreach my $group (map {BioSD::Group->new($_)} @{BioSD::Adaptor::query_groups($self_id)}) {
+    #foreach my $group (map {BioSD::Group->new($_)} @{BioSD::Adaptor::query_groups($self_id)}) {
+    foreach my $group (@{BioSD::search_for_groups($self_id)}) {
       SAMPLE:
-      foreach my $sample (map {BioSD::Sample->new($_)} @{BioSD::Adaptor::query_samples($group->id, $self_id)}) {
+      #foreach my $sample (map {BioSD::Sample->new($_)} @{BioSD::Adaptor::query_samples($group->id, $self_id)}) {
+      foreach my $sample (@{BioSD::search_for_samples($group, $self_id)}) {
         next SAMPLE if ! grep {$self_id eq $_->id} @{$sample->derived_from};
         push(@derivatives, $sample);
       }
@@ -250,7 +250,7 @@ sub groups {
   if (! $self->{_groups}) {
     my @groups;
     my $self_id = $self->id;
-    foreach my $group (map {BioSD::Group->new($_)} @{BioSD::Adaptor::query_groups($self_id)}) {
+    foreach my $group (@{BioSD::search_for_groups($self_id)}) {
       if (grep {$_->id eq $self_id} @{$group->samples}) {
         push(@groups, $group);
       }

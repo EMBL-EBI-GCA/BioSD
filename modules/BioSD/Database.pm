@@ -26,7 +26,7 @@
 =head1 SYNOPSIS
 
     # fetch a database from a valid Group object
-    my ($database) = $group->databases();
+    my ($database) = @{$group->databases()};
 
     # get some information about the database
     my $id = $database->id(); 

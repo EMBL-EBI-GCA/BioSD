@@ -55,11 +55,7 @@ package BioSD::Group;
 use strict;
 use warnings;
 
-require BioSD::Sample;
-use BioSD::Adaptor;
-use BioSD::Property;
-use BioSD::TermSource;
-use BioSD::Database;
+require BioSD;
 
 my %cache;
 
@@ -294,14 +290,14 @@ sub property {
 
 sub samples {
   my ($self) = @_;
-  $self->{_samples} //= [map {BioSD::Sample->new($_)} @{BioSD::Adaptor::query_samples($self->id, '')}];
+  $self->{_samples} //= BioSD::search_for_samples($self, '');
   return $self->{_samples};
 }
 
-=head query_samples
+=head search_for_samples
 
   Arg [1]    : string  query
-  Example    : @samples = @{$group->query_samples('female')}
+  Example    : @samples = @{$group->search_for_samples('female')}
   Description: Gets a list of samples that are contained by this group and match
                the query
   Returntype : arrayref of BioSD::Sample
@@ -309,9 +305,9 @@ sub samples {
 
 =cut
 
-sub query_samples {
+sub search_for_samples {
   my ($self, $query) = @_;
-  return [map {BioSD::Sample->new($_)} @{BioSD::Adaptor::query_samples($self->id, $query)}];
+  return BioSD::search_for_samples($self, $query);
 }
 
 

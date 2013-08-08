@@ -28,7 +28,7 @@ use warnings;
 =head1 SYNOPSIS
 
     # fetch a term source from a valid Group object or Property object
-    my ($term_source) = $group->term_sources();
+    my ($term_source) = @{$group->term_sources()};
     my $term_source = $property->term_source();
 
     # get some information about the term source

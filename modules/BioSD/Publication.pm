@@ -24,7 +24,7 @@
 =head1 SYNOPSIS
 
     # fetch a publication from a valid Group object
-    my ($publication) = $group->publications();
+    my ($publication) = @{$group->publications()};
 
     # get some information about the publication
     my $doi = $publication->doi(); 

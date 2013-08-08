@@ -26,8 +26,8 @@
 =head1 SYNOPSIS
 
     # fetch annotations from a valid Sample object or Group object
-    my ($sample_annotation) = $sample->annotations();
-    my ($group_annotation) = $group->annotations();
+    my @sample_annotations = @{$sample->annotations()};
+    my @group_annotations = @{$group->annotations()};
 
     # get some information about the annotation
     my $type = $annotation->type(); 

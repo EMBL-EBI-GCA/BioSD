@@ -28,7 +28,7 @@ use warnings;
 =head1 SYNOPSIS
 
     # fetch an organization from a valid Group object
-    my ($organization) = $group->organizations();
+    my ($organization) = @{$group->organizations()};
 
     # get some information about the organization
     my $address = $organization->address(); 
