@@ -17,55 +17,55 @@
 
 =cut
 
-package BioSD::Organization;
+package BioSD::TermSource;
 use strict;
 use warnings;
 
 =head1 NAME
 
-    BioSD::Organization
+    BioSD::TermSource
 
 =head1 SYNOPSIS
 
-    # fetch an organization from a valid Group object
-    my ($organization) = $group->organizations();
+    # fetch a term source from a valid Group object or Property object
+    my ($term_source) = $group->term_sources();
+    my $term_source = $property->term_source();
 
-    # get some information about the organization
-    my $address = $organization->address(); 
-    my $uri = $organization->uri(); 
-    my $email = $organization->email(); 
-    my $role = $organization->role(); 
-    my $name = $organization->name(); 
+    # get some information about the term source
+    my $version = $term_source->version(); 
+    my $uri = $term_source->uri(); 
+    my $term_source_id = $term_source->term_source_id(); 
+    my $description = $term_source->description(); 
+    my $name = $term_source->name(); 
 
 =head1 Description
 
-    A BioSD::Organization object represents an organization associated with a
-    group in the BioSamples databases
+    A BioSD::TermSource object describes the source of the term used to describe
+    a Property in the BioSamples database e.g. an ontology
 
 =cut
 
-
-=head address
+=head version
 
   Arg [1]    : none
-  Example    : $address = $organization->address()
-  Description: Returns the address of the organization
+  Example    : $version = $term_source->version()
+  Description: Returns the version of the term_source
   Returntype : string or undefined
   Exceptions : none
 
 =cut
 
-sub address {
+sub version {
   my ($self) = @_;
-  my ($address) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Address');
-  return $address;
+  my ($version) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Version');
+  return $version;
 }
 
 =head uri
 
   Arg [1]    : none
-  Example    : $uri = $organization->uri()
-  Description: Returns the uri associated with the organization
+  Example    : $uri = $term_source->uri()
+  Description: Returns the uri associated with the term_source
   Returntype : string or undefined
   Exceptions : none
 
@@ -77,43 +77,44 @@ sub uri {
   return $uri;
 }
 
-=head email
+=head term_source_id
 
   Arg [1]    : none
-  Example    : $email = $organization->email()
-  Description: Returns the email associated with the organization
+  Example    : $term_source_id = $term_source->term_source_id()
+  Description: Returns the id associated with the term in the term source (e.g.
+               an onotology id)
   Returntype : string or undefined
   Exceptions : none
 
 =cut
 
-sub email {
+sub term_source_id {
   my ($self) = @_;
-  my ($email) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Email');
-  return $email;
+  my ($term_source_id) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('TermSourceID');
+  return $term_source_id;
 }
 
-=head role
+=head description
 
   Arg [1]    : none
-  Example    : $rold = $organization->rold()
-  Description: Returns the role of the organization
+  Example    : $description = $term_source->description()
+  Description: Returns a description of the term source
   Returntype : string or undefined
   Exceptions : none
 
 =cut
 
-sub role {
+sub description {
   my ($self) = @_;
-  my ($role) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Role');
-  return $role;
+  my ($description) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Description');
+  return $description;
 }
 
 =head name
 
   Arg [1]    : none
-  Example    : $name = $organization->name()
-  Description: Returns the name associated with the organization
+  Example    : $name = $term_source->name()
+  Description: Returns the name of the term source
   Returntype : string
   Exceptions : none
 
@@ -124,7 +125,6 @@ sub name {
   my ($name) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Name');
   return $name;
 }
-
 
 sub _new{
   my ($class, $xml_element) = @_;
@@ -142,6 +142,5 @@ sub _xml_element {
   }
   return $self->{_xml_element};
 }
-
 
 1;

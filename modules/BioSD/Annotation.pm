@@ -17,27 +17,70 @@
 
 =cut
 
+=pod
+
+=head1 NAME
+
+    BioSD::Annotation
+
+=head1 SYNOPSIS
+
+    # fetch annotations from a valid Sample object or Group object
+    my ($sample_annotation) = $sample->annotations();
+    my ($group_annotation) = $group->annotations();
+
+    # get some information about the annotation
+    my $type = $annotation->type(); 
+    my $value = $annotation->to_string()
+
+=head1 Description
+
+    A BioSD::Annotation object represents a piece of data held for a Sample or a
+    Group in the BioSamples database
+
+=cut
+
 package BioSD::Annotation;
 use strict;
 use warnings;
 
-sub new{
-  my ($class, $xml_element) = @_;
-  my $self = {};
-  bless $self, $class;
+=head to_string
 
-  $self->_xml_element($xml_element);
-  return $self;
-}
+  Arg [1]    : none
+  Example    : $value = $annotation->to_string()
+  Description: Returns the literal value of the annotation
+  Returntype : string
+  Exceptions : none
+
+=cut
 
 sub to_string {
   my ($self) = @_;
   return $self->_xml_element->to_literal;
 }
 
+=head type
+
+  Arg [1]    : none
+  Example    : $type = $annotation->type()
+  Description: Returns the type describing the annotation
+  Returntype : string
+  Exceptions : none
+
+=cut
+
 sub type {
   my ($self) = @_;
   return $self->_xml_element->getAttribute('type');
+}
+
+sub _new{
+  my ($class, $xml_element) = @_;
+  my $self = {};
+  bless $self, $class;
+
+  $self->_xml_element($xml_element);
+  return $self;
 }
 
 

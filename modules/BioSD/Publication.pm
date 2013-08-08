@@ -17,18 +17,41 @@
 
 =cut
 
+=head1 NAME
+
+    BioSD::Publication
+
+=head1 SYNOPSIS
+
+    # fetch a publication from a valid Group object
+    my ($publication) = $group->publications();
+
+    # get some information about the publication
+    my $doi = $publication->doi(); 
+    my $pubmed_id = $publication->pubmed_id(); 
+
+=head1 Description
+
+    A BioSD::Publication object represents a publication associated with a group
+    in the BioSamples databases
+
+=cut
+
+
 package BioSD::Publication;
 use strict;
 use warnings;
 
-sub new{
-  my ($class, $xml_element) = @_;
-  my $self = {};
-  bless $self, $class;
+=head doi
 
-  $self->_xml_element($xml_element);
-  return $self;
-}
+  Arg [1]    : none
+  Example    : $doi = $publication->doi()
+  Description: Returns the doi (digital object identifier) of the
+               publication
+  Returntype : string or undefined
+  Exceptions : none
+
+=cut
 
 sub doi {
   my ($self) = @_;
@@ -36,10 +59,29 @@ sub doi {
   return $doi;
 }
 
+=head pubmed_id
+
+  Arg [1]    : none
+  Example    : $pubmed_id = $publication->pubmed_id()
+  Description: Returns the pubmed_id of the publication
+  Returntype : string or undefined
+  Exceptions : none
+
+=cut
+
 sub pubmed_id {
   my ($self) = @_;
   my ($pubmed_id) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('PubMedID');
   return $pubmed_id;
+}
+
+sub _new{
+  my ($class, $xml_element) = @_;
+  my $self = {};
+  bless $self, $class;
+
+  $self->_xml_element($xml_element);
+  return $self;
 }
 
 sub _xml_element {
