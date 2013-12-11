@@ -17,11 +17,21 @@
 
 =cut
 
+package BioSD;
+
 =pod
 
 =head1 NAME
 
     BioSD
+
+=head1 VERSION
+
+Version 0.01
+
+=cut
+
+our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
@@ -41,7 +51,6 @@
 =cut
 
 
-package BioSD;
 use strict;
 use warnings;
 
@@ -58,8 +67,6 @@ require BioSD::Property;
 require BioSD::Publication;
 require BioSD::Sample;
 require BioSD::TermSource;
-
-our $VERSION='0.1';
 
 
 =head BioSD::root_url
