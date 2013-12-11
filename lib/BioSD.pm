@@ -59,6 +59,8 @@ require BioSD::Publication;
 require BioSD::Sample;
 require BioSD::TermSource;
 
+our $VERSION='0.1';
+
 
 =head BioSD::root_url
 
