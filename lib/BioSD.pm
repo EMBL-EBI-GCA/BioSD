@@ -19,11 +19,9 @@
 
 package BioSD;
 
-=pod
-
 =head1 NAME
 
-    BioSD
+BioSD - Programmatic access to BioSD from EBI
 
 =head1 VERSION
 
