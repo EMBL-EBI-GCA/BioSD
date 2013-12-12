@@ -69,7 +69,7 @@ require BioSD::Sample;
 require BioSD::TermSource;
 
 
-=head BioSD::root_url
+=head2 BioSD::root_url
 
   Description: Package variable set to http://www.ebi.ac.uk/biosamples/xml
                It is unlikely you will want to change this variable
@@ -79,7 +79,7 @@ require BioSD::TermSource;
 
 our $root_url = 'http://www.ebi.ac.uk/biosamples/xml';
 
-=head BioSD::query_pagesize
+=head2 BioSD::query_pagesize
 
   Description: Package variable set to 500. It is unlikely you will want to
                change this variable
@@ -92,7 +92,7 @@ our $root_url = 'http://www.ebi.ac.uk/biosamples/xml';
 
 our $query_pagesize = 500;
 
-=head fetch_sample
+=head2 fetch_sample
 
   Arg [1]    : string   sample_id
   Example    : $group = BioSD::fetch_sample('SAME123456');
@@ -110,7 +110,7 @@ sub fetch_sample {
   return $sample;
 }
 
-=head fetch_group
+=head2 fetch_group
 
   Arg [1]    : string   group_id
   Example    : $group = BioSD::fetch_group('SAMEG123456');
@@ -128,7 +128,7 @@ sub fetch_group {
   return $group;
 }
 
-=head search_for_groups
+=head2 search_for_groups
 
   Arg [1]    : string        the search query term
   Example    : @groups = @{BioSD::search_for_groups('cancer')}
@@ -144,7 +144,7 @@ sub search_for_groups {
   return \@groups;
 }
 
-=head search_for_samples
+=head2 search_for_samples
 
   Arg [1]    : BioSD::Group  group within which to search
   Arg [2]    : string        the search query term
