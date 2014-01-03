@@ -63,6 +63,7 @@ require BioSD::Organization;
 require BioSD::Person;
 require BioSD::Property;
 require BioSD::Publication;
+require BioSD::QualifiedValue;
 require BioSD::Sample;
 require BioSD::TermSource;
 

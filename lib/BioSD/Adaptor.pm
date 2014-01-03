@@ -44,7 +44,7 @@ sub fetch_sample_element {
   my $location = "$BioSD::root_url/sample/$sample_id";
   my $response = $ua->get($location);
   die $response->status_line if $response->is_error;
-  return undef if ($response->content !~ /^<[^<>]*><BioSample/);
+  return undef if ($response->content !~ /^<.*><BioSample/);
   return XML::LibXML->load_xml( string => $response->content)->getDocumentElement;
 }
 
@@ -53,7 +53,7 @@ sub fetch_group_element {
   my $location = "$BioSD::root_url/group/$group_id";
   my $response = $ua->get($location);
   die $response->status_line if $response->is_error;
-  return undef if ($response->content !~ /^<[^<>]*><BioSampleGroup/);
+  return undef if ($response->content !~ /^<.*><BioSampleGroup/);
   return XML::LibXML->load_xml( string => $response->content)->getDocumentElement;
 }
 

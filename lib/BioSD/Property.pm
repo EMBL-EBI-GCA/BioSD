@@ -49,55 +49,20 @@ use warnings;
 
 require BioSD;
 
-=head value
+=head values
 
   Arg [1]    : none
-  Example    : $value = $property->value()
-  Description: Returns the literal value of the property
-  Returntype : string
+  Example    : @values = @{$property->value()}
+  Description: Returns the literal values of the property
+               Identical to [map {$_->value} @{$property->qualified_values()}]
+  Returntype : arrayref of strings
   Exceptions : none
 
 =cut
 
-sub value {
+sub values {
   my ($self) = @_;
-  my ($value) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Value');
-  return $value;
-}
-
-=head unit
-
-  Arg [1]    : none
-  Example    : $unit = $property->unit()
-  Description: Returns the units of the value of the property e.g. 'grams'
-  Returntype : string or undef
-  Exceptions : none
-
-=cut
-
-sub unit {
-  my ($self) = @_;
-  my ($unit) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Unit');
-  return $unit;
-}
-
-=head term_source
-
-  Arg [1]    : none
-  Example    : $term_source = $property->term_source()
-  Description: Returns the term source associated with this property
-  Returntype : BioSD::TermSource or undef
-  Exceptions : none
-
-=cut
-
-sub term_source {
-  my ($self) = @_;
-  if (!$self->{_term_source}) {
-    ($self->{_term_source}) = map {BioSD::TermSource->_new($_)}
-              $self->_xml_element->getChildrenByTagName('TermSourceREF');
-  }
-  return $self->{_term_source};
+  return [map {$_->value} @{$self->qualified_values()}];
 }
 
 =head is_comment
@@ -164,6 +129,23 @@ sub is_characteristic {
   my $is_characteristic = $self->_xml_element->getAttribute('characteristic');
   return 0 if ! $is_characteristic;
   return 1;
+}
+
+=head qualified_values
+
+  Arg [1]    : none
+  Example    : @qualified_values = @{$property->qualified_value()}
+  Description: Gets a list of qualified values for this property
+  Returntype : arrayref of BioSD::QualifiedValue
+  Exceptions : none
+
+=cut
+
+sub qualified_values {
+  my ($self) = @_;
+  $self->{_qualified_values} //= [map {BioSD::QualifiedValue->_new($_)}
+            $self->_xml_element->getChildrenByTagName('QualifiedValue')];
+  return $self->{_qualified_values};
 }
 
 sub _xml_element {
