@@ -122,7 +122,7 @@ sub fetch_sample {
 
 sub fetch_group {
   my ($group_id) = @_;
-  my $group = BioSD::group->new($group_id);
+  my $group = BioSD::Group->new($group_id);
   return undef if ! $group->is_valid;
   return $group;
 }
