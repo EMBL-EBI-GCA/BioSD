@@ -138,8 +138,8 @@ sub annotations {
   my ($self) = @_;
   my $group_xml_element = $self->_xml_element;
   die 'No attributes for invalid Sample Group with id ' . $self->id if !$group_xml_element;
-  $self->{_attributes} //= [map {BioSD::Attribute->_new($_)}
-            $group_xml_element->getChildrenByTagName('Attribute')];
+  $self->{_attributes} //= [map {BioSD::Annotation->_new($_)}
+            $group_xml_element->getChildrenByTagName('Annotation')];
   return $self->{_attributes};
 }
 
@@ -159,7 +159,7 @@ sub term_sources {
   my $group_xml_element = $self->_xml_element;
   die 'No term_sources for invalid Sample Group with id ' . $self->id if !$group_xml_element;
   $self->{_term_sources} //= [map {BioSD::TermSource->_new($_)}
-            $group_xml_element->getChildrenByTagName('TermSource')];
+            BioSD::XPathContext::findnodes('./SG:TermSource', $group_xml_element)];
   return $self->{_term_sources};
 }
 
@@ -178,7 +178,7 @@ sub properties {
   my $group_xml_element = $self->_xml_element;
   die 'No properties for invalid Sample Group with id ' . $self->id if !$group_xml_element;
   $self->{_properties} //= [map {BioSD::Property->_new($_)}
-            $group_xml_element->getChildrenByTagName('Property')];
+            BioSD::XPathContext::findnodes('./SG:Property', $group_xml_element)];
   return $self->{_properties};
 }
 
@@ -198,7 +198,7 @@ sub organizations {
   my $group_xml_element = $self->_xml_element;
   die 'No organizations for invalid Sample Group with id ' . $self->id if !$group_xml_element;
   $self->{_organizations} //= [map {BioSD::Organization->_new($_)}
-            $group_xml_element->getChildrenByTagName('Organization')];
+            BioSD::XPathContext::findnodes('./SG:Organization', $group_xml_element)];
   return $self->{_organizations};
 }
 
@@ -218,7 +218,7 @@ sub people {
   my $group_xml_element = $self->_xml_element;
   die 'No people for invalid Sample Group with id ' . $self->id if !$group_xml_element;
   $self->{_people} //= [map {BioSD::TermSource->_new($_)}
-            $group_xml_element->getChildrenByTagName('Person')];
+            BioSD::XPathContext::findnodes('./SG:Person', $group_xml_element)];
   return $self->{_people};
 }
 
@@ -238,7 +238,7 @@ sub databases {
   my $group_xml_element = $self->_xml_element;
   die 'No databases for invalid Sample Group with id ' . $self->id if !$group_xml_element;
   $self->{_databases} //= [map {BioSD::Database->_new($_)}
-            $group_xml_element->getChildrenByTagName('Database')];
+            BioSD::XPathContext::findnodes('./SG:Database', $group_xml_element)];
   return $self->{_databases};
 }
 
@@ -258,7 +258,7 @@ sub publications {
   my $group_xml_element = $self->_xml_element;
   die 'No publications for invalid Sample Group with id ' . $self->id if !$group_xml_element;
   $self->{_publications} //= [map {BioSD::Publication->_new($_)}
-            $group_xml_element->getChildrenByTagName('Publication')];
+            BioSD::XPathContext::findnodes('./SG:Publication', $group_xml_element)];
   return $self->{_publications};
 }
 

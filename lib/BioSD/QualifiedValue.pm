@@ -55,8 +55,7 @@ use warnings;
 
 sub value {
   my ($self) = @_;
-  my ($value) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Value');
-  return $value;
+  return BioSD::XPathContext::findvalue('./SG:Value', $self->_xml_element);
 }
 
 =head unit
@@ -71,8 +70,7 @@ sub value {
 
 sub unit {
   my ($self) = @_;
-  my ($unit) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Unit');
-  return $unit;
+  return BioSD::XPathContext::findvalue('./SG:Unit', $self->_xml_element);
 }
 
 =head term_source

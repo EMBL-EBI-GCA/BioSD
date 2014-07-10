@@ -57,8 +57,7 @@ use warnings;
 
 sub address {
   my ($self) = @_;
-  my ($address) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Address');
-  return $address;
+  return BioSD::XPathContext::findvalue('./SG:Address', $self->_xml_element);
 }
 
 =head uri
@@ -73,8 +72,7 @@ sub address {
 
 sub uri {
   my ($self) = @_;
-  my ($uri) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('URI');
-  return $uri;
+  return BioSD::XPathContext::findvalue('./SG:URI', $self->_xml_element);
 }
 
 =head email
@@ -89,8 +87,7 @@ sub uri {
 
 sub email {
   my ($self) = @_;
-  my ($email) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Email');
-  return $email;
+  return BioSD::XPathContext::findvalue('./SG:Email', $self->_xml_element);
 }
 
 =head role
@@ -105,8 +102,7 @@ sub email {
 
 sub role {
   my ($self) = @_;
-  my ($role) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Role');
-  return $role;
+  return BioSD::XPathContext::findvalue('./SG:Role', $self->_xml_element);
 }
 
 =head name
@@ -121,8 +117,7 @@ sub role {
 
 sub name {
   my ($self) = @_;
-  my ($name) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Name');
-  return $name;
+  return BioSD::XPathContext::findvalue('./SG:Name', $self->_xml_element);
 }
 
 

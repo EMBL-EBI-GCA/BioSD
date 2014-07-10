@@ -44,7 +44,7 @@ sub fetch_sample_element {
   my $location = "$BioSD::root_url/sample/$sample_id";
   my $response = $ua->get($location);
   die $response->status_line if $response->is_error;
-  return undef if ($response->content !~ /^<.*><BioSample/);
+  return undef if ($response->content !~ /<BioSample/);
   return XML::LibXML->load_xml( string => $response->content)->getDocumentElement;
 }
 
@@ -53,7 +53,7 @@ sub fetch_group_element {
   my $location = "$BioSD::root_url/group/$group_id";
   my $response = $ua->get($location);
   die $response->status_line if $response->is_error;
-  return undef if ($response->content !~ /^<.*><BioSampleGroup/);
+  return undef if ($response->content !~ /<BioSampleGroup/);
   return XML::LibXML->load_xml( string => $response->content)->getDocumentElement;
 }
 
@@ -87,8 +87,8 @@ sub fetch_sample_ids {
   PAGE:
   while (1) {
     my $query_element = fetch_groupsamples_query_element($group_id, $query, $page);
-    push(@sample_ids, map {$_->to_literal} $query_element->findnodes('./BioSample/@id'));
-    $total //= $query_element->findvalue('./SummaryInfo/Total');
+    push(@sample_ids, map {$_->value} BioSD::XPathContext::findnodes('./RQ:BioSample/@id', $query_element));
+    $total //= BioSD::XPathContext::findvalue('./RQ:SummaryInfo/RQ:Total', $query_element);
     last PAGE if $total <= $page*$BioSD::query_pagesize;
     $page += 1;
   }
@@ -106,8 +106,8 @@ sub fetch_group_ids {
   PAGE:
   while (1) {
     my $query_element = fetch_group_query_element($query, $page);
-    push(@group_ids, map {$_->to_literal} $query_element->findnodes('./BioSampleGroup/@id'));
-    $total //= $query_element->findvalue('./SummaryInfo/Total');
+    push(@group_ids, map {$_->value} BioSD::XPathContext::findnodes('./RQ:BioSampleGroup/@id', $query_element));
+    $total //= BioSD::XPathContext::findvalue('./RQ:SummaryInfo/RQ:Total', $query_element);
     last PAGE if $total <= $page*$BioSD::query_pagesize;
     $page += 1;
   }

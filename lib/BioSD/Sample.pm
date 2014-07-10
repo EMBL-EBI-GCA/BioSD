@@ -141,7 +141,7 @@ sub annotations {
   my $sample_xml_element = $self->_xml_element;
   die 'No annotations for invalid Sample with id ' . $self->id if !$sample_xml_element;
   $self->{_annotations} //= [map {BioSD::Annotation->_new($_)}
-            $self->_xml_element->getChildrenByTagName('Annotation')];
+            BioSD::XPathContext::findnodes('./SG:Annotation', $sample_xml_element)];
   return $self->{_annotations};
 }
 
@@ -160,7 +160,7 @@ sub properties {
   my $sample_xml_element = $self->_xml_element;
   die 'No properties for invalid Sample with id ' . $self->id if !$sample_xml_element;
   $self->{_properties} //= [map {BioSD::Property->_new($_)}
-            $self->_xml_element->getChildrenByTagName('Property')];
+            BioSD::XPathContext::findnodes('./SG:Property', $sample_xml_element)];
   return $self->{_properties};
 }
 
@@ -179,7 +179,7 @@ sub derived_from {
   my $sample_xml_element = $self->_xml_element;
   die 'No derived from for invalid Sample with id ' . $self->id if !$sample_xml_element;
   if (!$self->{_derived_from}) {
-    my @ancester_ids = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('derivedFrom');
+    my @ancester_ids = map {$_->to_literal} BioSD::XPathContext::findnodes('./SG:derivedFrom', $sample_xml_element);
     if (my $derived_from_property = $self->property('Derived From')) {
       push(@ancester_ids, split(',', $derived_from_property->value));
     }
@@ -200,15 +200,13 @@ sub derived_from {
 
 sub derivatives {
   my ($self) = @_;
-  my $sample_xml_element = $self->_xml_element;
-  die 'No derivatives for invalid Sample with id ' . $self->id if !$sample_xml_element;
+  #my $sample_xml_element = $self->_xml_element;
+  #die 'No derivatives for invalid Sample with id ' . $self->id if !$sample_xml_element;
   if (!$self->{_derivatives}) {
     my @derivatives;
     my $self_id = $self->id;
-    #foreach my $group (map {BioSD::Group->new($_)} @{BioSD::Adaptor::query_groups($self_id)}) {
     foreach my $group (@{BioSD::search_for_groups($self_id)}) {
       SAMPLE:
-      #foreach my $sample (map {BioSD::Sample->new($_)} @{BioSD::Adaptor::query_samples($group->id, $self_id)}) {
       foreach my $sample (@{BioSD::search_for_samples($group, $self_id)}) {
         next SAMPLE if ! grep {$self_id eq $_->id} @{$sample->derived_from};
         push(@derivatives, $sample);

@@ -144,7 +144,7 @@ sub is_characteristic {
 sub qualified_values {
   my ($self) = @_;
   $self->{_qualified_values} //= [map {BioSD::QualifiedValue->_new($_)}
-            $self->_xml_element->getChildrenByTagName('QualifiedValue')];
+            BioSD::XPathContext::findnodes('./SG:QualifiedValue', $self->_xml_element)];
   return $self->{_qualified_values};
 }
 

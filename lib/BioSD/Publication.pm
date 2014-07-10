@@ -55,8 +55,7 @@ use warnings;
 
 sub doi {
   my ($self) = @_;
-  my ($doi) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('DOI');
-  return $doi;
+  return BioSD::XPathContext::findvalue('./SG:DOI', $self->_xml_element);
 }
 
 =head pubmed_id
@@ -71,8 +70,7 @@ sub doi {
 
 sub pubmed_id {
   my ($self) = @_;
-  my ($pubmed_id) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('PubMedID');
-  return $pubmed_id;
+  return BioSD::XPathContext::findvalue('./SG:PubMedID', $self->_xml_element);
 }
 
 sub _new{

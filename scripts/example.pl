@@ -9,8 +9,8 @@ my $sample_id = 'SAMEA1603480';
 my $sample = BioSD::fetch_sample($sample_id);
 my $sample_name = $sample->property('Sample Name')->values->[0];
 
-print "sample id is $sample_id\n";
-print "sample name is $sample_name\n";
+print "sample id is: $sample_id\n";
+print "sample name is: $sample_name\n";
 print "\n";
 
 my $groups = $sample->groups;

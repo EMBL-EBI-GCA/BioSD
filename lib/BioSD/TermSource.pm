@@ -57,8 +57,7 @@ use warnings;
 
 sub version {
   my ($self) = @_;
-  my ($version) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Version');
-  return $version;
+  return BioSD::XPathContext::findvalue('./SG:Version', $self->_xml_element);
 }
 
 =head uri
@@ -73,8 +72,7 @@ sub version {
 
 sub uri {
   my ($self) = @_;
-  my ($uri) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('URI');
-  return $uri;
+  return BioSD::XPathContext::findvalue('./SG:URI', $self->_xml_element);
 }
 
 =head term_source_id
@@ -90,8 +88,7 @@ sub uri {
 
 sub term_source_id {
   my ($self) = @_;
-  my ($term_source_id) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('TermSourceID');
-  return $term_source_id;
+  return BioSD::XPathContext::findvalue('./SG:TermSourceID', $self->_xml_element);
 }
 
 =head description
@@ -106,8 +103,7 @@ sub term_source_id {
 
 sub description {
   my ($self) = @_;
-  my ($description) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Description');
-  return $description;
+  return BioSD::XPathContext::findvalue('./SG:Description', $self->_xml_element);
 }
 
 =head name
@@ -122,8 +118,7 @@ sub description {
 
 sub name {
   my ($self) = @_;
-  my ($name) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Name');
-  return $name;
+  return BioSD::XPathContext::findvalue('./SG:Name', $self->_xml_element);
 }
 
 sub _new{

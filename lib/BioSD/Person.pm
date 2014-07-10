@@ -56,8 +56,7 @@ use warnings;
 
 sub first_name {
   my ($self) = @_;
-  my ($first_name) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('FirstName');
-  return $first_name;
+  return BioSD::XPathContext::findvalue('./SG:FirstName', $self->_xml_element);
 }
 
 =head last_name
@@ -72,8 +71,7 @@ sub first_name {
 
 sub last_name {
   my ($self) = @_;
-  my ($last_name) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('LastName');
-  return $last_name;
+  return BioSD::XPathContext::findvalue('./SG:LastName', $self->_xml_element);
 }
 
 =head mid_initials
@@ -88,8 +86,7 @@ sub last_name {
 
 sub mid_initials {
   my ($self) = @_;
-  my ($mid_initials) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('MidInitials');
-  return $mid_initials;
+  return BioSD::XPathContext::findvalue('./SG:MidInitials', $self->_xml_element);
 }
 
 =head email
@@ -104,8 +101,7 @@ sub mid_initials {
 
 sub email {
   my ($self) = @_;
-  my ($email) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Email');
-  return $email;
+  return BioSD::XPathContext::findvalue('./SG:Email', $self->_xml_element);
 }
 
 =head role
@@ -120,8 +116,7 @@ sub email {
 
 sub role {
   my ($self) = @_;
-  my ($role) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Role');
-  return $role;
+  return BioSD::XPathContext::findvalue('./SG:Role', $self->_xml_element);
 }
 
 sub _new{

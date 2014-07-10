@@ -57,8 +57,7 @@ use warnings;
 
 sub id {
   my ($self) = @_;
-  my ($id) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('ID');
-  return $id;
+  return BioSD::XPathContext::findvalue('./SG:ID', $self->_xml_element);
 }
 
 =head uri
@@ -74,8 +73,7 @@ sub id {
 
 sub uri {
   my ($self) = @_;
-  my ($uri) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('URI');
-  return $uri;
+  return BioSD::XPathContext::findvalue('./SG:URI', $self->_xml_element);
 }
 
 =head name
@@ -92,8 +90,7 @@ sub uri {
 
 sub name {
   my ($self) = @_;
-  my ($name) = map {$_->to_literal} $self->_xml_element->getChildrenByTagName('Name');
-  return $name;
+  return BioSD::XPathContext::findvalue('./SG:Name', $self->_xml_element);
 }
 
 

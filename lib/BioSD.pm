@@ -66,6 +66,7 @@ require BioSD::Publication;
 require BioSD::QualifiedValue;
 require BioSD::Sample;
 require BioSD::TermSource;
+require BioSD::XPathContext;
 
 
 =head2 BioSD::root_url
