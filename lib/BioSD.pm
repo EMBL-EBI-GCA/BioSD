@@ -157,8 +157,26 @@ sub search_for_groups {
 =cut
 
 sub search_for_samples {
+  my ($query) = @_;
+  my @samples = map {BioSD::Sample->new($_)} @{BioSD::Adaptor::fetch_sample_ids($query)};
+  return \@samples;
+}
+
+=head2 search_for_samples_in_group
+
+  Arg [1]    : BioSD::Group  group within which to search
+  Arg [2]    : string        the search query term
+  Example    : @samples = @{BioSD::search_for_samples($group, 'female')}
+  Description: Gets a list of samples that are contained by this group and match
+               the query
+  Returntype : arrayref of BioSD::Sample
+  Exceptions : none
+
+=cut
+
+sub search_for_samples_in_group {
   my ($group, $query) = @_;
-  my @samples = map {BioSD::Sample->new($_)} @{BioSD::Adaptor::fetch_sample_ids($group->id, $query)};
+  my @samples = map {BioSD::Sample->new($_)} @{BioSD::Adaptor::fetch_sample_ids_in_group($group->id, $query)};
   return \@samples;
 }
 

@@ -79,7 +79,19 @@ sub fetch_group_query_element {
   return XML::LibXML->load_xml( string => $response->content)->getDocumentElement;
 }
 
-sub fetch_sample_ids {
+sub fetch_sample_query_element {
+  my ($query, $page) = @_;
+  my $location = "$BioSD::root_url/sample/query=";
+  $location .= $query if $query;
+  $location .= "&page=$page" if defined $page;
+  $location .= "&pagesize=$BioSD::query_pagesize";
+  my $response = $ua->get($location);
+  die $response->status_line if $response->is_error;
+  return XML::LibXML->load_xml( string => $response->content)->getDocumentElement;
+}
+
+
+sub fetch_sample_ids_in_group {
   my ($group_id, $query) = @_;
   my @sample_ids;
   my $page = 1;
@@ -114,3 +126,21 @@ sub fetch_group_ids {
   return \@group_ids;
 }
 
+sub fetch_sample_ids {
+  my ($query) = @_;
+  if (!$query) {
+    warn('BioSD: Call to fetch_sample_ids with an empty query is returning EVERY Biosample in the database');
+  }
+  my @sample_ids;
+  my $page = 1;
+  my $total;
+  PAGE:
+  while (1) {
+    my $query_element = fetch_sample_query_element($query, $page);
+    push(@sample_ids, map {$_->value} BioSD::XPathContext::findnodes('./RQ:BioSample/@id', $query_element));
+    $total //= BioSD::XPathContext::findvalue('./RQ:SummaryInfo/RQ:Total', $query_element);
+    last PAGE if $total <= $page*$BioSD::query_pagesize;
+    $page += 1;
+  }
+  return \@sample_ids;
+}

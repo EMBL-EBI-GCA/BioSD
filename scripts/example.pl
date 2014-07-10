@@ -5,7 +5,7 @@ use warnings;
 
 use BioSD;
 
-my $sample_id = 'SAMEA2397817';
+my $sample_id = 'SAMEA2201446';
 my $sample = BioSD::fetch_sample($sample_id);
 my $sample_name = $sample->property('Sample Name')->values->[0];
 

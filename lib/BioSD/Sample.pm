@@ -198,19 +198,34 @@ sub derived_from {
 
 =cut
 
+#sub derivatives {
+#  my ($self) = @_;
+#  #my $sample_xml_element = $self->_xml_element;
+#  #die 'No derivatives for invalid Sample with id ' . $self->id if !$sample_xml_element;
+#  if (!$self->{_derivatives}) {
+#    my @derivatives;
+#    my $self_id = $self->id;
+#    foreach my $group (@{BioSD::search_for_groups($self_id)}) {
+#      SAMPLE:
+#      foreach my $sample (@{BioSD::search_for_samples($group, $self_id)}) {
+#        next SAMPLE if ! grep {$self_id eq $_->id} @{$sample->derived_from};
+#        push(@derivatives, $sample);
+#      }
+#    }
+#    $self->{_derivatives} = \@derivatives;
+#  }
+#  return $self->{_derivatives};
+#}
+
 sub derivatives {
   my ($self) = @_;
-  #my $sample_xml_element = $self->_xml_element;
-  #die 'No derivatives for invalid Sample with id ' . $self->id if !$sample_xml_element;
   if (!$self->{_derivatives}) {
     my @derivatives;
     my $self_id = $self->id;
-    foreach my $group (@{BioSD::search_for_groups($self_id)}) {
-      SAMPLE:
-      foreach my $sample (@{BioSD::search_for_samples($group, $self_id)}) {
-        next SAMPLE if ! grep {$self_id eq $_->id} @{$sample->derived_from};
-        push(@derivatives, $sample);
-      }
+    SAMPLE:
+    foreach my $sample (@{BioSD::search_for_samples($self_id)}) {
+      next SAMPLE if ! grep {$self_id eq $_->id} @{$sample->derived_from};
+      push(@derivatives, $sample);
     }
     $self->{_derivatives} = \@derivatives;
   }

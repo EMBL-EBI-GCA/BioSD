@@ -290,7 +290,7 @@ sub property {
 
 sub samples {
   my ($self) = @_;
-  $self->{_samples} //= BioSD::search_for_samples($self, '');
+  $self->{_samples} //= BioSD::search_for_samples_in_group($self, '');
   return $self->{_samples};
 }
 
@@ -307,7 +307,7 @@ sub samples {
 
 sub search_for_samples {
   my ($self, $query) = @_;
-  return BioSD::search_for_samples($self, $query);
+  return BioSD::search_for_samples_in_group($self, $query);
 }
 
 
