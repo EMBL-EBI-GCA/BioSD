@@ -5,7 +5,7 @@ use warnings;
 
 use BioSD;
 
-my $sample_id = 'SAMEA1603480';
+my $sample_id = 'SAMEA2201446';
 my $sample = BioSD::fetch_sample($sample_id);
 my $sample_name = $sample->property('Sample Name')->values->[0];
 
@@ -15,7 +15,7 @@ print "\n";
 
 my $groups = $sample->groups;
 my $num_groups = scalar @$groups;
-print "sample belongs to $num_groups groups:\n";
+print "sample $sample_name belongs to $num_groups groups:\n";
 foreach my $group (@$groups) {
   print $group->id, ": ", $group->property('Submission Title')->values->[0], "\n";
 }
@@ -33,5 +33,21 @@ print "\n";
 
 foreach my $ancester (@{$sample->derived_from}) {
   print "The following samples were also derived from ", $ancester->id, ":\n";
-  print join(', ', map {$_->id} @{$ancester->derivatives}), "\n";
+  foreach my $derivative (@{$ancester->derivatives}) {
+    print $derivative->id, ": ", $derivative->property('Sample Name')->values->[0], "\n";
+  }
+}
+print "\n";
+
+print "sample $sample_name has the following properties:\n";
+foreach my $property (@{$sample->properties}) {
+  print $property->class, ' = ', join(',', @{$property->values});
+  foreach my $qualified_value (@{$property->qualified_values}) {
+    if (my $term_source = $qualified_value->term_source) {
+      print "\t", $term_source->term_source_id;
+    }
+  }
+  print "\tThis is a comment" if $property->is_comment;
+  print "\tThis is a characteristic" if $property->is_characteristic;
+  print "\n";
 }
