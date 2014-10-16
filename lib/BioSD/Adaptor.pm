@@ -60,7 +60,7 @@ sub fetch_group_element {
 sub fetch_groupsamples_query_element {
   my ($group_id, $query, $page) = @_;
   my $location = "$BioSD::root_url/groupsamples/$group_id/query=";
-  $location .= $query;
+  $location .= q(").$query.q(");
   $location .= "&page=$page" if defined $page;
   $location .= "&pagesize=$BioSD::query_pagesize";
   my $response = $ua->get($location);
@@ -71,7 +71,7 @@ sub fetch_groupsamples_query_element {
 sub fetch_group_query_element {
   my ($query, $page) = @_;
   my $location = "$BioSD::root_url/group/query=";
-  $location .= $query if $query;
+  $location .= q(").$query.q(") if $query;
   $location .= "&page=$page" if defined $page;
   $location .= "&pagesize=$BioSD::query_pagesize";
   my $response = $ua->get($location);
@@ -82,7 +82,7 @@ sub fetch_group_query_element {
 sub fetch_sample_query_element {
   my ($query, $page) = @_;
   my $location = "$BioSD::root_url/sample/query=";
-  $location .= $query if $query;
+  $location .= q(").$query.q(") if $query;
   $location .= "&page=$page" if defined $page;
   $location .= "&pagesize=$BioSD::query_pagesize";
   my $response = $ua->get($location);
