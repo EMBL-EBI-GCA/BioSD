@@ -60,7 +60,7 @@ sub fetch_group_element {
 sub fetch_groupsamples_query_element {
   my ($group_id, $query, $page) = @_;
   my $location = "$BioSD::root_url/groupsamples/$group_id/query=";
-  $location .= q(").$query.q(");
+  $location .= q(").$query.q(") if $query;
   $location .= "&page=$page" if defined $page;
   $location .= "&pagesize=$BioSD::query_pagesize";
   my $response = $ua->get($location);
