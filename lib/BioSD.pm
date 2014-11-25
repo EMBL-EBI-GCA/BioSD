@@ -92,6 +92,19 @@ our $root_url = 'http://www.ebi.ac.uk/biosamples/xml';
 
 our $query_pagesize = 500;
 
+=head2 BioSD::max_fetch_attempts
+
+  Description: Package variable set to 5. It is unlikely you will want to
+               change this variable
+               When querying the rest server, this is the maximum number of
+               times a single query is allowed to fail and get retried before
+               an error is thrown
+  Example    : $BioSD::max_fetch_attemps = 1;
+
+=cut
+
+our $max_fetch_attemps = 5;
+
 =head2 fetch_sample
 
   Arg [1]    : string   sample_id

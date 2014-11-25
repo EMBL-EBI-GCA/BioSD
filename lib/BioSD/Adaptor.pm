@@ -115,11 +115,18 @@ sub fetch_group_ids {
   my @group_ids;
   my $page = 1;
   my $total;
+  my $fetch_attempts = 0;
   PAGE:
   while (1) {
     my $query_element = fetch_group_query_element($query, $page);
-    push(@group_ids, map {$_->value} BioSD::XPathContext::findnodes('./RQ:BioSampleGroup/@id', $query_element));
     $total //= BioSD::XPathContext::findvalue('./RQ:SummaryInfo/RQ:Total', $query_element);
+    my $last_id = BioSD::XPathContext::findvalue('./RQ:SummaryInfo/RQ:To', $query_element);
+    if ($total && $last_id == -1) {
+      $fetch_attempts += 1;
+      die "Could not query $query: Rest server error" if $fetch_attempts >= $BioSD::max_fetch_attempts;
+      redo PAGE;
+    }
+    push(@group_ids, map {$_->value} BioSD::XPathContext::findnodes('./RQ:BioSampleGroup/@id', $query_element));
     last PAGE if $total <= $page*$BioSD::query_pagesize;
     $page += 1;
   }
@@ -134,11 +141,18 @@ sub fetch_sample_ids {
   my @sample_ids;
   my $page = 1;
   my $total;
+  my $fetch_attempts = 0;
   PAGE:
   while (1) {
     my $query_element = fetch_sample_query_element($query, $page);
-    push(@sample_ids, map {$_->value} BioSD::XPathContext::findnodes('./RQ:BioSample/@id', $query_element));
     $total //= BioSD::XPathContext::findvalue('./RQ:SummaryInfo/RQ:Total', $query_element);
+    my $last_id = BioSD::XPathContext::findvalue('./RQ:SummaryInfo/RQ:To', $query_element);
+    if ($total && $last_id == -1) {
+      $fetch_attempts += 1;
+      die "Could not query $query: Rest server error" if $fetch_attempts >= $BioSD::max_fetch_attempts;
+      redo PAGE;
+    }
+    push(@sample_ids, map {$_->value} BioSD::XPathContext::findnodes('./RQ:BioSample/@id', $query_element));
     last PAGE if $total <= $page*$BioSD::query_pagesize;
     $page += 1;
   }
