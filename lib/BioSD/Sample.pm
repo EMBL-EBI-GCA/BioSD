@@ -255,6 +255,27 @@ sub groups {
 }
 
 
+=head matches
+
+  Arg [1]    : none
+  Example    : my $is_gwas = $sample->matches('gwas')
+  Description: Searches through all of a sample's properties to see if the sample
+               matches some text
+  Returntype : Boolean
+  Exceptions : none
+
+=cut
+
+sub matches {
+  my ($self, $text) = @_;
+  foreach my $property (@{$self->properties}) {
+    foreach my $value (@{$property->values}) {
+      return 1 if $value =~ /$text/i;
+    }
+  }
+  return 0;
+}
+
 sub _xml_element {
   my ($self) = @_;
   return $self->{_xml_element} if defined $self->{_xml_element};
