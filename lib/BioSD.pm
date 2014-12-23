@@ -54,6 +54,7 @@ use warnings;
 
 use LWP::UserAgent;
 use XML::LibXML;
+use URI::Escape;
 
 require BioSD::Adaptor;
 require BioSD::Annotation;
