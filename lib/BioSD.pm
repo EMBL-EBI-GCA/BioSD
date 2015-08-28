@@ -100,11 +100,11 @@ our $query_pagesize = 500;
                When querying the rest server, this is the maximum number of
                times a single query is allowed to fail and get retried before
                an error is thrown
-  Example    : $BioSD::max_fetch_attemps = 1;
+  Example    : $BioSD::max_fetch_attempts = 1;
 
 =cut
 
-our $max_fetch_attemps = 5;
+our $max_fetch_attempts = 5;
 
 =head2 fetch_sample
 
