@@ -229,6 +229,26 @@ sub property {
   return (grep {$_->class eq $class} @{$self->properties})[0];
 }
 
+=head databases
+
+  Arg [1]    : none
+  Example    : @databases = @{$sample->databases()}
+  Description: Gets a list of databases associated with this sample in the
+               BioSamples database
+  Returntype : arrayref of BioSD::Database
+  Exceptions : throws if sample is not present in BioSamples database
+
+=cut
+
+sub databases {
+  my ($self) = @_;
+  my $sample_xml_element = $self->_xml_element;
+  die 'No databases for invalid Sample with id ' . $self->id if !$sample_xml_element;
+  $self->{_databases} //= [map {BioSD::Database->_new($_)}
+            BioSD::XPathContext::findnodes('./SG:Database', $sample_xml_element)];
+  return $self->{_databases};
+}
+
 =head groups
 
   Arg [1]    : none
