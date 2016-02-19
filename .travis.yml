@@ -1,0 +1,7 @@
+language: perl
+sudo: false
+perl:
+  - "5.18"
+      
+script:
+  perl Build.PL && ./Build build && scripts/example.pl
