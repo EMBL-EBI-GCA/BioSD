@@ -67,6 +67,7 @@ require BioSD::QualifiedValue;
 require BioSD::Sample;
 require BioSD::TermSource;
 require BioSD::XPathContext;
+use BioSD::Session;
 
 =head2 BioSD::root_url
 
@@ -124,10 +125,7 @@ our $session = BioSD::Session->new();
 =cut
 
 sub fetch_sample {
-    my ($sample_id) = @_;
-    my $sample = BioSD::Sample->new($sample_id);
-    return undef if !$sample->is_valid;
-    return $sample;
+    return $session->fetch_sample(@_);
 }
 
 =head2 fetch_group

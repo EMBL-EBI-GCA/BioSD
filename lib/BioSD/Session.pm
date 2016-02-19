@@ -35,15 +35,33 @@ require BioSD;
 use strict;
 use warnings;
 
-sub new {
-  my ($class) = @_;
-  my $self = {
-    sample_cache => {},
-    group_cache => {}
-  };
-  bless $self, $class;
+use BioSD::Adaptor;
+use BioSD::Sample;
+use Scalar::Util qw(weaken);
 
-  return $self;
+sub new {
+    my ($class) = @_;
+    my $self = {
+        sample_cache => {},
+        group_cache  => {}
+    };
+    bless $self, $class;
+
+    my $ref = $self;
+    weaken($ref);
+    $self->{_weak_ref} = $ref;
+
+    return $self;
+}
+
+sub _cache {
+    my ( $self, $cache_name, $id, $thing ) = @_;
+
+    if ($thing) {
+        $self->{$cache_name}{$id} = $thing;
+    }
+
+    return $self->{$cache_name}{$id};
 }
 
 =head2 fetch_sample
@@ -58,10 +76,16 @@ sub new {
 =cut
 
 sub fetch_sample {
-  my ($self,$sample_id) = @_;
-  my $sample = BioSD::Sample->new($sample_id);
-  return undef if ! $sample->is_valid;
-  return $sample;
+    my ( $self, $sample_id ) = @_;
+
+    my $sample = $self->_cache( 'sample_cache', $sample_id );
+    return $sample if $sample;
+
+    $sample = BioSD::Sample->new( $sample_id, $self->_weak_ref );
+
+    $self->_cache( 'sample_cache', $sample_id, $sample );
+
+    return $sample;
 }
 
 =head2 fetch_group
@@ -76,10 +100,10 @@ sub fetch_sample {
 =cut
 
 sub fetch_group {
-  my ($self,$group_id) = @_;
-  my $group = BioSD::Group->new($group_id);
-  return undef if ! $group->is_valid;
-  return $group;
+    my ( $self, $group_id ) = @_;
+    my $group = BioSD::Group->new($group_id);
+    return undef if !$group->is_valid;
+    return $group;
 }
 
 =head2 search_for_groups
@@ -93,9 +117,11 @@ sub fetch_group {
 =cut
 
 sub search_for_groups {
-  my ($self,$query) = @_;
-  my @groups = map {BioSD::Group->new($_)} @{BioSD::Adaptor::fetch_group_ids($query)};
-  return \@groups;
+    my ( $self, $query ) = @_;
+    my @groups =
+      map { BioSD::Group->new($_) }
+      @{ BioSD::Adaptor::fetch_group_ids($query) };
+    return \@groups;
 }
 
 =head2 search_for_samples
@@ -111,9 +137,11 @@ sub search_for_groups {
 =cut
 
 sub search_for_samples {
-  my ($self,$query) = @_;
-  my @samples = map {BioSD::Sample->new($_)} @{BioSD::Adaptor::fetch_sample_ids($query)};
-  return \@samples;
+    my ( $self, $query ) = @_;
+    my @samples =
+      map { BioSD::Sample->new( $_, $self->_weak_ref ) }
+      @{ BioSD::Adaptor::fetch_sample_ids($query) };
+    return \@samples;
 }
 
 =head2 search_for_samples_in_group
@@ -129,9 +157,17 @@ sub search_for_samples {
 =cut
 
 sub search_for_samples_in_group {
-  my ($self,$group, $query) = @_;
-  my @samples = map {BioSD::Sample->new($_)} @{BioSD::Adaptor::fetch_sample_ids_in_group($group->id, $query)};
-  return \@samples;
+    my ( $self, $group, $query ) = @_;
+
+    my @samples =
+      map { BioSD::Sample->new( $_, $self->_weak_ref ) }
+      @{ BioSD::Adaptor::fetch_sample_ids_in_group( $group->id, $query ) };
+    return \@samples;
+}
+
+sub _weak_ref {
+    my ($self) = @_;
+    return $self->{_weak_ref};
 }
 
 1;
