@@ -48,7 +48,6 @@ our $VERSION = '0.01';
 
 =cut
 
-
 use strict;
 use warnings;
 
@@ -68,7 +67,6 @@ require BioSD::QualifiedValue;
 require BioSD::Sample;
 require BioSD::TermSource;
 require BioSD::XPathContext;
-
 
 =head2 BioSD::root_url
 
@@ -106,6 +104,14 @@ our $query_pagesize = 500;
 
 our $max_fetch_attempts = 5;
 
+=head2 BioSD::session
+
+  Description: Package variable for a BioSD::Session object. All subroutine calls are delegated to this.
+
+=cut
+
+our $session = BioSD::Session->new();
+
 =head2 fetch_sample
 
   Arg [1]    : string   sample_id
@@ -118,10 +124,10 @@ our $max_fetch_attempts = 5;
 =cut
 
 sub fetch_sample {
-  my ($sample_id) = @_;
-  my $sample = BioSD::Sample->new($sample_id);
-  return undef if ! $sample->is_valid;
-  return $sample;
+    my ($sample_id) = @_;
+    my $sample = BioSD::Sample->new($sample_id);
+    return undef if !$sample->is_valid;
+    return $sample;
 }
 
 =head2 fetch_group
@@ -136,10 +142,7 @@ sub fetch_sample {
 =cut
 
 sub fetch_group {
-  my ($group_id) = @_;
-  my $group = BioSD::Group->new($group_id);
-  return undef if ! $group->is_valid;
-  return $group;
+    return $session->fetch_group(@_);
 }
 
 =head2 search_for_groups
@@ -153,9 +156,7 @@ sub fetch_group {
 =cut
 
 sub search_for_groups {
-  my ($query) = @_;
-  my @groups = map {BioSD::Group->new($_)} @{BioSD::Adaptor::fetch_group_ids($query)};
-  return \@groups;
+    return $session->search_for_groups(@_);
 }
 
 =head2 search_for_samples
@@ -171,9 +172,7 @@ sub search_for_groups {
 =cut
 
 sub search_for_samples {
-  my ($query) = @_;
-  my @samples = map {BioSD::Sample->new($_)} @{BioSD::Adaptor::fetch_sample_ids($query)};
-  return \@samples;
+    return $session->search_for_samples(@_);
 }
 
 =head2 search_for_samples_in_group
@@ -189,10 +188,7 @@ sub search_for_samples {
 =cut
 
 sub search_for_samples_in_group {
-  my ($group, $query) = @_;
-  my @samples = map {BioSD::Sample->new($_)} @{BioSD::Adaptor::fetch_sample_ids_in_group($group->id, $query)};
-  return \@samples;
+    return $session->search_for_samples_in_group(@_);
 }
-
 
 1;
