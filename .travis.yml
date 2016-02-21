@@ -2,6 +2,7 @@ language: perl
 sudo: false
 perl:
   - "5.18"
-      
+env:
+  - PERL5LIB=$PWD/lib		  
 script:
   perl Build.PL && ./Build build && scripts/example.pl
