@@ -57,8 +57,6 @@ use warnings;
 
 require BioSD;
 
-my %cache;
-
 =head new
 
   Arg [1]    : string   SampleGroup id for the BioSamples database e.g.
@@ -79,16 +77,15 @@ my %cache;
 =cut
 
 sub new{
-  my ($class, $id) = @_;
+  my ($class, $id, $session) = @_;
   die 'A BioSD::Group must have an id' if ! $id;
-  if (my $cached = $cache{$id}) {
-    return $cached;
-  }
-  my $self = {};
+  die 'A BioSD::Group must have an session' if ! $session;
+ 
+  my $self = {_session => $session};
   bless $self, $class;
 
   $self->{'id'} = $id;
-  $cache{$id} = $self;
+
   return $self;
 }
 
@@ -290,7 +287,7 @@ sub property {
 
 sub samples {
   my ($self) = @_;
-  $self->{_samples} //= BioSD::search_for_samples_in_group($self, '');
+  $self->{_samples} //= $self->_session->search_for_samples_in_group($self, '');
   return $self->{_samples};
 }
 
@@ -307,7 +304,7 @@ sub samples {
 
 sub search_for_samples {
   my ($self, $query) = @_;
-  return BioSD::search_for_samples_in_group($self, $query);
+  return $self->_session->search_for_samples_in_group($self, $query);
 }
 
 =head matches
@@ -355,5 +352,9 @@ sub _query_failed {
   return $self->{_query_failed};
 }
 
+sub _session {
+	my ($self,) = @_;
+	return $self->{_session};
+}
 
 1;
