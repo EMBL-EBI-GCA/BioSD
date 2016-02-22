@@ -107,11 +107,11 @@ our $max_fetch_attempts = 5;
 
 =head2 BioSD::session
 
-  Description: Package variable for a BioSD::Session object. All subroutine calls are delegated to this.
+  Description: variable for a BioSD::Session object. All subroutine calls are delegated to this.
 
 =cut
 
-our $session = BioSD::Session->new();
+my $session = BioSD::Session->new();
 
 =head2 fetch_sample
 
