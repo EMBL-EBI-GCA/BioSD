@@ -37,10 +37,9 @@ use warnings;
 
 use BioSD::Adaptor;
 use BioSD::Sample;
-use Scalar::Util qw(weaken);
 
 my $sample_cache = 'samples';
-my $group_cache = 'groups';
+my $group_cache  = 'groups';
 
 sub new {
     my ($class) = @_;
@@ -49,10 +48,6 @@ sub new {
         $group_cache  => {},
     };
     bless $self, $class;
-
-    my $ref = $self;
-    weaken($ref);
-    $self->{_weakened_session_ref} = $ref;
 
     return $self;
 }
@@ -74,7 +69,7 @@ sub fetch_sample {
     my $sample = $self->_cache( $sample_cache, $sample_id );
     return $sample if $sample;
 
-    $sample = BioSD::Sample->new( $sample_id, $self->_weakened_session_ref );
+    $sample = BioSD::Sample->new( $sample_id, $self );
     return undef if !$sample->is_valid;
     $self->_cache( $sample_cache, $sample_id, $sample );
 
@@ -94,16 +89,15 @@ sub fetch_sample {
 
 sub fetch_group {
     my ( $self, $group_id ) = @_;
-    
+
     my $group = $self->_cache( $group_cache, $group_id );
     return $group if $group;
-    
-    $group = BioSD::Group->new($group_id,$self->_weakened_session_ref);
+
+    $group = BioSD::Group->new( $group_id, $self );
     return undef if !$group->is_valid;
-    
+
     $self->_cache( $group_cache, $group_id, $group );
-    
-    
+
     return $group;
 }
 
@@ -120,7 +114,7 @@ sub fetch_group {
 sub search_for_groups {
     my ( $self, $query ) = @_;
     my @groups =
-      map { BioSD::Group->new($_,$self->_weakened_session_ref) }
+      map { $self->fetch_group($_) }
       @{ BioSD::Adaptor::fetch_group_ids($query) };
     return \@groups;
 }
@@ -140,7 +134,7 @@ sub search_for_groups {
 sub search_for_samples {
     my ( $self, $query ) = @_;
     my @samples =
-      map { BioSD::Sample->new( $_, $self->_weakened_session_ref ) }
+      map { $self->fetch_sample($_) }
       @{ BioSD::Adaptor::fetch_sample_ids($query) };
     return \@samples;
 }
@@ -160,27 +154,11 @@ sub search_for_samples {
 sub search_for_samples_in_group {
     my ( $self, $group, $query ) = @_;
 
+    my $ids = BioSD::Adaptor::fetch_sample_ids_in_group( $group->id, $query );
+
     my @samples =
-      map { BioSD::Sample->new( $_, $self->_weakened_session_ref ) }
-      @{ BioSD::Adaptor::fetch_sample_ids_in_group( $group->id, $query ) };
+      map { $self->fetch_sample($_) } @$ids;
     return \@samples;
-}
-
-
-=head2 _weakened_session_ref
-
-  Example    : my $session = $session->_weakened_session_ref
-  Description: Gets a weakened ref to this session object.
-               Used to avoid circular references with the sample
-               and group objects held in the cache
-  Returntype : BioSD::Session
-  Exceptions : none
-
-=cut
-
-sub _weakened_session_ref {
-    my ($self) = @_;
-    return $self->{_weakened_session_ref};
 }
 
 =head2 _cache
@@ -192,6 +170,7 @@ sub _weakened_session_ref {
   Exceptions : none
 
 =cut
+
 sub _cache {
     my ( $self, $cache_name, $id, $thing ) = @_;
 

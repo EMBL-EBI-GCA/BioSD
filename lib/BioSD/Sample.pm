@@ -57,7 +57,10 @@ package BioSD::Sample;
 use strict;
 use warnings;
 use Carp;
+use List::Util qw(any);
+use Scalar::Util qw(weaken);
 require BioSD;
+
 
 =head new
 
@@ -79,10 +82,10 @@ sub new {
     my ( $class, $id, $session ) = @_;
     confess 'A BioSD::Sample must have an id'     if !$id;
     confess 'A BioSD::Sample must have a session' if !$session;
-    
+
     my $self = { _id => $id, _session => $session };
     bless $self, $class;
-
+    weaken($self->{_session});
     return $self;
 }
 
@@ -179,7 +182,8 @@ sub derived_from {
     my $sample_xml_element = $self->_xml_element;
     die 'No derived from for invalid Sample with id ' . $self->id
       if !$sample_xml_element;
-    if ( !$self->{_derived_from} ) {
+
+    if ( !$self->{_derived_from_ids} ) {
         my @ancester_ids =
           map { $_->to_literal }
           BioSD::XPathContext::findnodes( './SG:derivedFrom',
@@ -187,10 +191,14 @@ sub derived_from {
         if ( my $derived_from_property = $self->property('Derived From') ) {
             push( @ancester_ids, split( ',', $derived_from_property->value ) );
         }
-        $self->{_derived_from} =
-          [ map { BioSD::Sample->new($_,$self->_session) } @ancester_ids ];
+        $self->{_derived_from_ids} = \@ancester_ids;
+
     }
-    return $self->{_derived_from};
+
+    my @ancestors =
+      map { $self->_session->fetch_sample($_) } @{ $self->{_derived_from_ids} };
+
+    return \@ancestors;
 }
 
 =head derived_from
@@ -205,18 +213,24 @@ sub derived_from {
 
 sub derivatives {
     my ($self) = @_;
-    if ( !$self->{_derivatives} ) {
-        my @derivatives;
+    if ( !$self->{_derivative_ids} ) {
+        my @derivative_ids;
         my $self_id = $self->id;
       SAMPLE:
-        foreach my $sample ( @{ $self->_session->search_for_samples($self_id) } ) {
+        foreach
+          my $sample ( @{ $self->_session->search_for_samples($self_id) } )
+        {
             next SAMPLE
-              if !grep { $self_id eq $_->id } @{ $sample->derived_from };
-            push( @derivatives, $sample );
+              if !any { $self_id eq $_->id } @{ $sample->derived_from };
+            push( @derivative_ids, $sample->id );
         }
-        $self->{_derivatives} = \@derivatives;
+        $self->{_derivative_ids} = \@derivative_ids;
     }
-    return $self->{_derivatives};
+
+    my @derivatives =
+      map { $self->_session->fetch_sample($_) } @{ $self->{_derivative_ids} };
+
+    return \@derivatives;
 }
 
 =head property
@@ -271,17 +285,22 @@ sub databases {
 
 sub groups {
     my ($self) = @_;
-    if ( !$self->{_groups} ) {
-        my @groups;
+    if ( !$self->{_group_ids} ) {
+        my @group_ids;
         my $self_id = $self->id;
-        foreach my $group ( @{ $self->_session->search_for_groups($self_id) } ) {
-            if ( grep { $_->id eq $self_id } @{ $group->samples } ) {
-                push( @groups, $group );
+        foreach my $group ( @{ $self->_session->search_for_groups($self_id) } )
+        {
+            if ( any { $_ eq $self_id } @{ $group->sample_ids } ) {
+                push( @group_ids, $group->id );
             }
         }
-        $self->{_groups} = \@groups;
+        $self->{_group_ids} = \@group_ids;
     }
-    return $self->{_groups};
+
+    my @groups =
+      map { $self->_session->fetch_group($_) } @{ $self->{_group_ids} };
+
+    return \@groups;
 }
 
 =head matches
@@ -328,7 +347,7 @@ sub _query_failed {
 }
 
 sub _session {
-    my ( $self ) = @_;
+    my ($self) = @_;
     return $self->{_session};
 }
 
