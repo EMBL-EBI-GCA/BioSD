@@ -54,10 +54,9 @@ package BioSD::Group;
 
 use strict;
 use warnings;
+use Scalar::Util qw(weaken);
 
 require BioSD;
-
-my %cache;
 
 =head new
 
@@ -78,18 +77,17 @@ my %cache;
 
 =cut
 
-sub new{
-  my ($class, $id) = @_;
-  die 'A BioSD::Group must have an id' if ! $id;
-  if (my $cached = $cache{$id}) {
-    return $cached;
-  }
-  my $self = {};
-  bless $self, $class;
+sub new {
+    my ( $class, $id, $session ) = @_;
+    die 'A BioSD::Group must have an id'      if !$id;
+    die 'A BioSD::Group must have an session' if !$session;
 
-  $self->{'id'} = $id;
-  $cache{$id} = $self;
-  return $self;
+    my $self = { _session => $session };
+    bless $self, $class;
+
+    $self->{'id'} = $id;
+    weaken($self->{_session});
+    return $self;
 }
 
 =head id
@@ -103,8 +101,8 @@ sub new{
 =cut
 
 sub id {
-  my ($self) = @_;
-  return $self->{'id'};
+    my ($self) = @_;
+    return $self->{'id'};
 }
 
 =head is_valid
@@ -118,10 +116,10 @@ sub id {
 =cut
 
 sub is_valid {
-  my ($self) = @_;
-  return 0 if $self->_query_failed;
-  return 1 if defined $self->_xml_element;
-  return 0;
+    my ($self) = @_;
+    return 0 if $self->_query_failed;
+    return 1 if defined $self->_xml_element;
+    return 0;
 }
 
 =head annotations
@@ -135,12 +133,14 @@ sub is_valid {
 =cut
 
 sub annotations {
-  my ($self) = @_;
-  my $group_xml_element = $self->_xml_element;
-  die 'No attributes for invalid Sample Group with id ' . $self->id if !$group_xml_element;
-  $self->{_attributes} //= [map {BioSD::Annotation->_new($_)}
-            $group_xml_element->getChildrenByTagName('Annotation')];
-  return $self->{_attributes};
+    my ($self) = @_;
+    my $group_xml_element = $self->_xml_element;
+    die 'No attributes for invalid Sample Group with id ' . $self->id
+      if !$group_xml_element;
+    $self->{_attributes} //=
+      [ map { BioSD::Annotation->_new($_) }
+          $group_xml_element->getChildrenByTagName('Annotation') ];
+    return $self->{_attributes};
 }
 
 =head term_sources
@@ -155,12 +155,16 @@ sub annotations {
 =cut
 
 sub term_sources {
-  my ($self) = @_;
-  my $group_xml_element = $self->_xml_element;
-  die 'No term_sources for invalid Sample Group with id ' . $self->id if !$group_xml_element;
-  $self->{_term_sources} //= [map {BioSD::TermSource->_new($_)}
-            BioSD::XPathContext::findnodes('./SG:TermSource', $group_xml_element)];
-  return $self->{_term_sources};
+    my ($self) = @_;
+    my $group_xml_element = $self->_xml_element;
+    die 'No term_sources for invalid Sample Group with id ' . $self->id
+      if !$group_xml_element;
+    $self->{_term_sources} //= [
+        map { BioSD::TermSource->_new($_) } BioSD::XPathContext::findnodes(
+            './SG:TermSource', $group_xml_element
+        )
+    ];
+    return $self->{_term_sources};
 }
 
 =head properties
@@ -174,12 +178,15 @@ sub term_sources {
 =cut
 
 sub properties {
-  my ($self) = @_;
-  my $group_xml_element = $self->_xml_element;
-  die 'No properties for invalid Sample Group with id ' . $self->id if !$group_xml_element;
-  $self->{_properties} //= [map {BioSD::Property->_new($_)}
-            BioSD::XPathContext::findnodes('./SG:Property', $group_xml_element)];
-  return $self->{_properties};
+    my ($self) = @_;
+    my $group_xml_element = $self->_xml_element;
+    die 'No properties for invalid Sample Group with id ' . $self->id
+      if !$group_xml_element;
+    $self->{_properties} //=
+      [ map { BioSD::Property->_new($_) }
+          BioSD::XPathContext::findnodes( './SG:Property', $group_xml_element )
+      ];
+    return $self->{_properties};
 }
 
 =head organizations
@@ -194,12 +201,16 @@ sub properties {
 =cut
 
 sub organizations {
-  my ($self) = @_;
-  my $group_xml_element = $self->_xml_element;
-  die 'No organizations for invalid Sample Group with id ' . $self->id if !$group_xml_element;
-  $self->{_organizations} //= [map {BioSD::Organization->_new($_)}
-            BioSD::XPathContext::findnodes('./SG:Organization', $group_xml_element)];
-  return $self->{_organizations};
+    my ($self) = @_;
+    my $group_xml_element = $self->_xml_element;
+    die 'No organizations for invalid Sample Group with id ' . $self->id
+      if !$group_xml_element;
+    $self->{_organizations} //= [
+        map { BioSD::Organization->_new($_) } BioSD::XPathContext::findnodes(
+            './SG:Organization', $group_xml_element
+        )
+    ];
+    return $self->{_organizations};
 }
 
 =head people
@@ -214,12 +225,14 @@ sub organizations {
 =cut
 
 sub people {
-  my ($self) = @_;
-  my $group_xml_element = $self->_xml_element;
-  die 'No people for invalid Sample Group with id ' . $self->id if !$group_xml_element;
-  $self->{_people} //= [map {BioSD::TermSource->_new($_)}
-            BioSD::XPathContext::findnodes('./SG:Person', $group_xml_element)];
-  return $self->{_people};
+    my ($self) = @_;
+    my $group_xml_element = $self->_xml_element;
+    die 'No people for invalid Sample Group with id ' . $self->id
+      if !$group_xml_element;
+    $self->{_people} //=
+      [ map { BioSD::TermSource->_new($_) }
+          BioSD::XPathContext::findnodes( './SG:Person', $group_xml_element ) ];
+    return $self->{_people};
 }
 
 =head databases
@@ -234,12 +247,15 @@ sub people {
 =cut
 
 sub databases {
-  my ($self) = @_;
-  my $group_xml_element = $self->_xml_element;
-  die 'No databases for invalid Sample Group with id ' . $self->id if !$group_xml_element;
-  $self->{_databases} //= [map {BioSD::Database->_new($_)}
-            BioSD::XPathContext::findnodes('./SG:Database', $group_xml_element)];
-  return $self->{_databases};
+    my ($self) = @_;
+    my $group_xml_element = $self->_xml_element;
+    die 'No databases for invalid Sample Group with id ' . $self->id
+      if !$group_xml_element;
+    $self->{_databases} //=
+      [ map { BioSD::Database->_new($_) }
+          BioSD::XPathContext::findnodes( './SG:Database', $group_xml_element )
+      ];
+    return $self->{_databases};
 }
 
 =head publications
@@ -254,12 +270,16 @@ sub databases {
 =cut
 
 sub publications {
-  my ($self) = @_;
-  my $group_xml_element = $self->_xml_element;
-  die 'No publications for invalid Sample Group with id ' . $self->id if !$group_xml_element;
-  $self->{_publications} //= [map {BioSD::Publication->_new($_)}
-            BioSD::XPathContext::findnodes('./SG:Publication', $group_xml_element)];
-  return $self->{_publications};
+    my ($self) = @_;
+    my $group_xml_element = $self->_xml_element;
+    die 'No publications for invalid Sample Group with id ' . $self->id
+      if !$group_xml_element;
+    $self->{_publications} //= [
+        map { BioSD::Publication->_new($_) } BioSD::XPathContext::findnodes(
+            './SG:Publication', $group_xml_element
+        )
+    ];
+    return $self->{_publications};
 }
 
 =head property
@@ -274,8 +294,8 @@ sub publications {
 =cut
 
 sub property {
-  my ($self, $class) = @_;
-  return (grep {$_->class eq $class} @{$self->properties})[0];
+    my ( $self, $class ) = @_;
+    return ( grep { $_->class eq $class } @{ $self->properties } )[0];
 }
 
 =head samples
@@ -289,9 +309,26 @@ sub property {
 =cut
 
 sub samples {
-  my ($self) = @_;
-  $self->{_samples} //= BioSD::search_for_samples_in_group($self, '');
-  return $self->{_samples};
+    my ($self) = @_;
+
+    return [ map { $self->_session->fetch_sample($_) }
+          @{ $self->sample_ids } ];
+}
+
+=head sample_ids
+
+  Arg [1]    : none
+  Example    : @sample_ids = @{$group->sample_ids()}
+  Description: Gets a list of IDs for samples that are contained by this group
+  Returntype : arrayref of strings
+  Exceptions : none
+
+=cut
+
+sub sample_ids {
+  my ($self)  = @_;
+  $self->{_sample_ids} //= BioSD::Adaptor::fetch_sample_ids_in_group( $self->id, '' );
+  return $self->{_sample_ids};
 }
 
 =head search_for_samples
@@ -306,8 +343,8 @@ sub samples {
 =cut
 
 sub search_for_samples {
-  my ($self, $query) = @_;
-  return BioSD::search_for_samples_in_group($self, $query);
+    my ( $self, $query ) = @_;
+    return $self->_session->search_for_samples_in_group( $self, $query );
 }
 
 =head matches
@@ -322,38 +359,40 @@ sub search_for_samples {
 =cut
 
 sub matches {
-  my ($self, $text) = @_;
-  foreach my $property (@{$self->properties}) {
-    foreach my $value (@{$property->values}) {
-      return 1 if $value =~ /$text/i;
+    my ( $self, $text ) = @_;
+    foreach my $property ( @{ $self->properties } ) {
+        foreach my $value ( @{ $property->values } ) {
+            return 1 if $value =~ /$text/i;
+        }
     }
-  }
-  return 0;
+    return 0;
 }
 
-
-
 sub _xml_element {
-  my ($self) = @_;
-  return $self->{_xml_element} if defined $self->{_xml_element};
-  return undef if $self->_query_failed;
+    my ($self) = @_;
+    return $self->{_xml_element} if defined $self->{_xml_element};
+    return undef if $self->_query_failed;
 
-  my $xml_element = BioSD::Adaptor::fetch_group_element($self->id);
-  if (!defined $xml_element) {
-    $self->_query_failed(1);
-    return undef;
-  }
-  $self->{_xml_element} = $xml_element;
-  return $xml_element;
+    my $xml_element = BioSD::Adaptor::fetch_group_element( $self->id );
+    if ( !defined $xml_element ) {
+        $self->_query_failed(1);
+        return undef;
+    }
+    $self->{_xml_element} = $xml_element;
+    return $xml_element;
 }
 
 sub _query_failed {
-  my ($self, $query_failed) = @_;
-  if ($query_failed) {
-    $self->{_query_failed} = 1;
-  }
-  return $self->{_query_failed};
+    my ( $self, $query_failed ) = @_;
+    if ($query_failed) {
+        $self->{_query_failed} = 1;
+    }
+    return $self->{_query_failed};
 }
 
+sub _session {
+    my ( $self, ) = @_;
+    return $self->{_session};
+}
 
 1;
