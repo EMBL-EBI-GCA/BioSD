@@ -38,14 +38,10 @@ use warnings;
 use BioSD::Adaptor;
 use BioSD::Sample;
 
-my $sample_cache = 'samples';
-my $group_cache  = 'groups';
-
 sub new {
     my ($class) = @_;
     my $self = {
-        $sample_cache => {},
-        $group_cache  => {},
+        cache => {},
     };
     bless $self, $class;
 
@@ -66,12 +62,12 @@ sub new {
 sub fetch_sample {
     my ( $self, $sample_id ) = @_;
 
-    my $sample = $self->_cache( $sample_cache, $sample_id );
+    my $sample = $self->_cache( $sample_id );
     return $sample if $sample;
 
     $sample = BioSD::Sample->new( $sample_id, $self );
     return undef if !$sample->is_valid;
-    $self->_cache( $sample_cache, $sample_id, $sample );
+    $self->_cache( $sample_id, $sample );
 
     return $sample;
 }
@@ -90,13 +86,13 @@ sub fetch_sample {
 sub fetch_group {
     my ( $self, $group_id ) = @_;
 
-    my $group = $self->_cache( $group_cache, $group_id );
+    my $group = $self->_cache( $group_id );
     return $group if $group;
 
     $group = BioSD::Group->new( $group_id, $self );
     return undef if !$group->is_valid;
 
-    $self->_cache( $group_cache, $group_id, $group );
+    $self->_cache( $group_id, $group );
 
     return $group;
 }
@@ -163,8 +159,8 @@ sub search_for_samples_in_group {
 
 =head2 _cache
 
-  Example    : my $group = $session->_cache('group_cache','SAMEG123456');
-               $session->_cache('group_cache','SAMEG123456',$group);
+  Example    : my $group = $session->_cache('SAMEG123456');
+               $session->_cache('SAMEG123456',$group);
   Description: Add an object to the named cache, or retrieve something from it
   Returntype : whatever you put into it, or undef
   Exceptions : none
@@ -172,13 +168,13 @@ sub search_for_samples_in_group {
 =cut
 
 sub _cache {
-    my ( $self, $cache_name, $id, $thing ) = @_;
+    my ( $self, $id, $thing ) = @_;
 
     if ($thing) {
-        $self->{$cache_name}{$id} = $thing;
+        $self->{cache}{$id} = $thing;
     }
 
-    return $self->{$cache_name}{$id};
+    return $self->{cache}{$id};
 }
 
 1;

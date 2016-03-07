@@ -111,7 +111,7 @@ our $max_fetch_attempts = 5;
 
 =cut
 
-my $session = BioSD::Session->new();
+our $session = BioSD::Session->new();
 
 =head2 fetch_sample
 

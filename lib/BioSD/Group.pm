@@ -80,13 +80,18 @@ require BioSD;
 sub new {
     my ( $class, $id, $session ) = @_;
     die 'A BioSD::Group must have an id'      if !$id;
-    die 'A BioSD::Group must have an session' if !$session;
-
-    my $self = { _session => $session };
-    bless $self, $class;
-
-    $self->{'id'} = $id;
-    weaken($self->{_session});
+    
+    $session = $BioSD::session if (!defined $session);
+    
+    my $self = $session->_cache($id); 
+    
+    if (!$self){
+      $self = { _id => $id, _session => $session };
+      bless $self, $class;
+      weaken($self->{_session});
+      $session->_cache($id,$self);
+    }
+    
     return $self;
 }
 
@@ -311,7 +316,7 @@ sub property {
 sub samples {
     my ($self) = @_;
 
-    return [ map { $self->_session->fetch_sample($_) }
+    return [ map { BioSD::Sample->new($_,$self->_session) }
           @{ $self->sample_ids } ];
 }
 
