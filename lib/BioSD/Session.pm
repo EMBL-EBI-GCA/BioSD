@@ -110,7 +110,7 @@ sub fetch_group {
 sub search_for_groups {
     my ( $self, $query ) = @_;
     my @groups =
-      map { $self->fetch_group($_) }
+      map { BioSD::Group->new($_,$self) }
       @{ BioSD::Adaptor::fetch_group_ids($query) };
     return \@groups;
 }
@@ -130,7 +130,7 @@ sub search_for_groups {
 sub search_for_samples {
     my ( $self, $query ) = @_;
     my @samples =
-      map { $self->fetch_sample($_) }
+      map { BioSD::Sample->new($_,$self)  }
       @{ BioSD::Adaptor::fetch_sample_ids($query) };
     return \@samples;
 }
@@ -153,7 +153,7 @@ sub search_for_samples_in_group {
     my $ids = BioSD::Adaptor::fetch_sample_ids_in_group( $group->id, $query );
 
     my @samples =
-      map { $self->fetch_sample($_) } @$ids;
+      map { BioSD::Sample->new($_,$self) } @$ids;
     return \@samples;
 }
 
