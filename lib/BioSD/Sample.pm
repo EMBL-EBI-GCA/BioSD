@@ -81,11 +81,18 @@ require BioSD;
 sub new {
     my ( $class, $id, $session ) = @_;
     confess 'A BioSD::Sample must have an id'     if !$id;
-    confess 'A BioSD::Sample must have a session' if !$session;
 
-    my $self = { _id => $id, _session => $session };
-    bless $self, $class;
-    weaken($self->{_session});
+    $session = $BioSD::session if (!defined $session);
+    
+    my $self = $session->_cache($id); 
+    
+    if (!$self){
+      $self = { _id => $id, _session => $session };
+      bless $self, $class;
+      weaken($self->{_session});
+      $session->_cache($id,$self);
+    }
+
     return $self;
 }
 
@@ -196,7 +203,7 @@ sub derived_from {
     }
 
     my @ancestors =
-      map { $self->_session->fetch_sample($_) } @{ $self->{_derived_from_ids} };
+      map { BioSD::Sample->new($_,$self->_session) } @{ $self->{_derived_from_ids} };
 
     return \@ancestors;
 }
@@ -228,7 +235,7 @@ sub derivatives {
     }
 
     my @derivatives =
-      map { $self->_session->fetch_sample($_) } @{ $self->{_derivative_ids} };
+      map { BioSD::Sample->new($_,$self->_session) } @{ $self->{_derivative_ids} };
 
     return \@derivatives;
 }
@@ -298,7 +305,7 @@ sub groups {
     }
 
     my @groups =
-      map { $self->_session->fetch_group($_) } @{ $self->{_group_ids} };
+      map { BioSD::Group->new($_,$self->_session) } @{ $self->{_group_ids} };
 
     return \@groups;
 }
