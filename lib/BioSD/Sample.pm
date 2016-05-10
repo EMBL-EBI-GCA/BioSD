@@ -61,7 +61,6 @@ use List::Util qw(any);
 use Scalar::Util qw(weaken);
 require BioSD;
 
-
 =head new
 
   Arg [1]    : string   sample id for the BioSamples database e.g. 'SAME123456'
@@ -79,21 +78,21 @@ require BioSD;
 =cut
 
 sub new {
-    my ( $class, $id, $session ) = @_;
-    confess 'A BioSD::Sample must have an id'     if !$id;
+  my ( $class, $id, $session ) = @_;
+  confess 'A BioSD::Sample must have an id' if !$id;
 
-    $session = $BioSD::session if (!defined $session);
-    
-    my $self = $session->_cache($id); 
-    
-    if (!$self){
-      $self = { _id => $id, _session => $session };
-      bless $self, $class;
-      weaken($self->{_session});
-      $session->_cache($id,$self);
-    }
+  $session = $BioSD::session if ( !defined $session );
 
-    return $self;
+  my $self = $session->_cache($id);
+
+  if ( !$self ) {
+    $self = { _id => $id, _session => $session };
+    bless $self, $class;
+    weaken( $self->{_session} );
+    $session->_cache( $id, $self );
+  }
+
+  return $self;
 }
 
 =head id
@@ -107,8 +106,8 @@ sub new {
 =cut
 
 sub id {
-    my ($self) = @_;
-    return $self->{_id};
+  my ($self) = @_;
+  return $self->{_id};
 }
 
 =head is_valid
@@ -122,10 +121,10 @@ sub id {
 =cut
 
 sub is_valid {
-    my ($self) = @_;
-    return 0 if $self->_query_failed;
-    return 1 if defined $self->_xml_element;
-    return 0;
+  my ($self) = @_;
+  return 0 if $self->_query_failed;
+  return 1 if defined $self->_xml_element;
+  return 0;
 }
 
 =head annotations
@@ -139,16 +138,15 @@ sub is_valid {
 =cut
 
 sub annotations {
-    my ($self) = @_;
-    my $sample_xml_element = $self->_xml_element;
-    die 'No annotations for invalid Sample with id ' . $self->id
-      if !$sample_xml_element;
-    $self->{_annotations} //= [
-        map { BioSD::Annotation->_new($_) } BioSD::XPathContext::findnodes(
-            './SG:Annotation', $sample_xml_element
-        )
+  my ($self) = @_;
+  my $sample_xml_element = $self->_xml_element;
+  die 'No annotations for invalid Sample with id ' . $self->id
+    if !$sample_xml_element;
+  $self->{_annotations} //=
+    [ map { BioSD::Annotation->_new($_) }
+      BioSD::XPathContext::findnodes( './SG:Annotation', $sample_xml_element )
     ];
-    return $self->{_annotations};
+  return $self->{_annotations};
 }
 
 =head properties
@@ -162,16 +160,14 @@ sub annotations {
 =cut
 
 sub properties {
-    my ($self) = @_;
-    my $sample_xml_element = $self->_xml_element;
-    die 'No properties for invalid Sample with id ' . $self->id
-      if !$sample_xml_element;
-    $self->{_properties} //= [
-        map { BioSD::Property->_new($_) } BioSD::XPathContext::findnodes(
-            './SG:Property', $sample_xml_element
-        )
-    ];
-    return $self->{_properties};
+  my ($self) = @_;
+  my $sample_xml_element = $self->_xml_element;
+  die 'No properties for invalid Sample with id ' . $self->id
+    if !$sample_xml_element;
+  $self->{_properties} //=
+    [ map { BioSD::Property->_new($_) }
+      BioSD::XPathContext::findnodes( './SG:Property', $sample_xml_element ) ];
+  return $self->{_properties};
 }
 
 =head derived_from
@@ -185,27 +181,27 @@ sub properties {
 =cut
 
 sub derived_from {
-    my ($self) = @_;
-    my $sample_xml_element = $self->_xml_element;
-    die 'No derived from for invalid Sample with id ' . $self->id
-      if !$sample_xml_element;
+  my ($self) = @_;
+  my $sample_xml_element = $self->_xml_element;
+  die 'No derived from for invalid Sample with id ' . $self->id
+    if !$sample_xml_element;
 
-    if ( !$self->{_derived_from_ids} ) {
-        my @ancester_ids =
-          map { $_->to_literal }
-          BioSD::XPathContext::findnodes( './SG:derivedFrom',
-            $sample_xml_element );
-        if ( my $derived_from_property = $self->property('Derived From') ) {
-            push( @ancester_ids, split( ',', $derived_from_property->value ) );
-        }
-        $self->{_derived_from_ids} = \@ancester_ids;
-
+  if ( !$self->{_derived_from_ids} ) {
+    my @ancester_ids =
+      map { $_->to_literal }
+      BioSD::XPathContext::findnodes( './SG:derivedFrom', $sample_xml_element );
+    if ( my $derived_from_property = $self->property('Derived From') ) {
+      push( @ancester_ids, split( ',', $derived_from_property->value ) );
     }
+    $self->{_derived_from_ids} = \@ancester_ids;
 
-    my @ancestors =
-      map { BioSD::Sample->new($_,$self->_session) } @{ $self->{_derived_from_ids} };
+  }
 
-    return \@ancestors;
+  my @ancestors =
+    map { BioSD::Sample->new( $_, $self->_session ) }
+    @{ $self->{_derived_from_ids} };
+
+  return \@ancestors;
 }
 
 =head derived_from
@@ -219,25 +215,24 @@ sub derived_from {
 =cut
 
 sub derivatives {
-    my ($self) = @_;
-    if ( !$self->{_derivative_ids} ) {
-        my @derivative_ids;
-        my $self_id = $self->id;
-      SAMPLE:
-        foreach
-          my $sample ( @{ $self->_session->search_for_samples($self_id) } )
-        {
-            next SAMPLE
-              if !any { $self_id eq $_->id } @{ $sample->derived_from };
-            push( @derivative_ids, $sample->id );
-        }
-        $self->{_derivative_ids} = \@derivative_ids;
+  my ($self) = @_;
+  if ( !$self->{_derivative_ids} ) {
+    my @derivative_ids;
+    my $self_id = $self->id;
+  SAMPLE:
+    foreach my $sample ( @{ $self->_session->search_for_samples($self_id) } ) {
+      next SAMPLE
+        if !any { $self_id eq $_->id } @{ $sample->derived_from };
+      push( @derivative_ids, $sample->id );
     }
+    $self->{_derivative_ids} = \@derivative_ids;
+  }
 
-    my @derivatives =
-      map { BioSD::Sample->new($_,$self->_session) } @{ $self->{_derivative_ids} };
+  my @derivatives =
+    map { BioSD::Sample->new( $_, $self->_session ) }
+    @{ $self->{_derivative_ids} };
 
-    return \@derivatives;
+  return \@derivatives;
 }
 
 =head property
@@ -252,8 +247,8 @@ sub derivatives {
 =cut
 
 sub property {
-    my ( $self, $class ) = @_;
-    return ( grep { $_->class eq $class } @{ $self->properties } )[0];
+  my ( $self, $class ) = @_;
+  return ( grep { $_->class eq $class } @{ $self->properties } )[0];
 }
 
 =head databases
@@ -268,16 +263,14 @@ sub property {
 =cut
 
 sub databases {
-    my ($self) = @_;
-    my $sample_xml_element = $self->_xml_element;
-    die 'No databases for invalid Sample with id ' . $self->id
-      if !$sample_xml_element;
-    $self->{_databases} //= [
-        map { BioSD::Database->_new($_) } BioSD::XPathContext::findnodes(
-            './SG:Database', $sample_xml_element
-        )
-    ];
-    return $self->{_databases};
+  my ($self) = @_;
+  my $sample_xml_element = $self->_xml_element;
+  die 'No databases for invalid Sample with id ' . $self->id
+    if !$sample_xml_element;
+  $self->{_databases} //=
+    [ map { BioSD::Database->_new($_) }
+      BioSD::XPathContext::findnodes( './SG:Database', $sample_xml_element ) ];
+  return $self->{_databases};
 }
 
 =head groups
@@ -291,23 +284,22 @@ sub databases {
 =cut
 
 sub groups {
-    my ($self) = @_;
-    if ( !$self->{_group_ids} ) {
-        my @group_ids;
-        my $self_id = $self->id;
-        foreach my $group ( @{ $self->_session->search_for_groups($self_id) } )
-        {
-            if ( any { $_ eq $self_id } @{ $group->sample_ids } ) {
-                push( @group_ids, $group->id );
-            }
-        }
-        $self->{_group_ids} = \@group_ids;
+  my ($self) = @_;
+  if ( !$self->{_group_ids} ) {
+    my @group_ids;
+    my $self_id = $self->id;
+    foreach my $group ( @{ $self->_session->search_for_groups($self_id) } ) {
+      if ( any { $_ eq $self_id } @{ $group->sample_ids } ) {
+        push( @group_ids, $group->id );
+      }
     }
+    $self->{_group_ids} = \@group_ids;
+  }
 
-    my @groups =
-      map { BioSD::Group->new($_,$self->_session) } @{ $self->{_group_ids} };
+  my @groups =
+    map { BioSD::Group->new( $_, $self->_session ) } @{ $self->{_group_ids} };
 
-    return \@groups;
+  return \@groups;
 }
 
 =head matches
@@ -322,40 +314,76 @@ sub groups {
 =cut
 
 sub matches {
-    my ( $self, $text ) = @_;
-    foreach my $property ( @{ $self->properties } ) {
-        foreach my $value ( @{ $property->values } ) {
-            return 1 if $value =~ /$text/i;
-        }
+  my ( $self, $text ) = @_;
+  foreach my $property ( @{ $self->properties } ) {
+    foreach my $value ( @{ $property->values } ) {
+      return 1 if $value =~ /$text/i;
     }
-    return 0;
+  }
+  return 0;
+}
+
+=head submission_release_date
+  Example    : my $release_date = $sample->submission_release_date();
+  Description: returns the samples release date
+  Returntype : scalar (text)
+  Exceptions : none
+=cut
+
+sub submission_release_date {
+  my ($self) = @_;
+
+  my $sample_xml_element = $self->_xml_element;
+  die 'No submission_date for invalid Sample with id ' . $self->id
+    if !$sample_xml_element;
+
+  return BioSD::XPathContext::findvalue( '/SG:BioSample/@submissionReleaseDate',
+    $sample_xml_element );
+}
+
+=head submission_update_date
+  Example    : my $release_date = $sample->submission_update_date();
+  Description: returns the samples update date
+  Returntype : scalar (text)
+  Exceptions : none
+=cut
+
+sub submission_update_date {
+  my ($self) = @_;
+
+  my $sample_xml_element = $self->_xml_element;
+  die 'No submission_date for invalid Sample with id ' . $self->id
+    if !$sample_xml_element;
+
+  return BioSD::XPathContext::findvalue( '/SG:BioSample/@submissionUpdateDate',
+    $sample_xml_element );
 }
 
 sub _xml_element {
-    my ($self) = @_;
-    return $self->{_xml_element} if defined $self->{_xml_element};
-    return undef if $self->_query_failed;
+  my ($self) = @_;
+  return $self->{_xml_element} if defined $self->{_xml_element};
+  return undef if $self->_query_failed;
 
-    my $xml_element = BioSD::Adaptor::fetch_sample_element( $self->id );
-    if ( !defined $xml_element ) {
-        $self->_query_failed(1);
-        return undef;
-    }
-    $self->{_xml_element} = $xml_element;
-    return $xml_element;
+  my $xml_element = BioSD::Adaptor::fetch_sample_element( $self->id );
+  if ( !defined $xml_element ) {
+    $self->_query_failed(1);
+    return undef;
+  }
+  $self->{_xml_element} = $xml_element;
+  return $xml_element;
 }
 
 sub _query_failed {
-    my ( $self, $query_failed ) = @_;
-    if ($query_failed) {
-        $self->{_query_failed} = 1;
-    }
-    return $self->{_query_failed};
+  my ( $self, $query_failed ) = @_;
+  if ($query_failed) {
+    $self->{_query_failed} = 1;
+  }
+  return $self->{_query_failed};
 }
 
 sub _session {
-    my ($self) = @_;
-    return $self->{_session};
+  my ($self) = @_;
+  return $self->{_session};
 }
 
 1;

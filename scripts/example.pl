@@ -8,9 +8,13 @@ use BioSD;
 my $sample_id = 'SAMEA2201446';
 my $sample = BioSD::fetch_sample($sample_id);
 my $sample_name = $sample->property('Sample Name')->values->[0];
+my $release_date = $sample->submission_release_date();
+my $update_date = $sample->submission_update_date();
 
 print "sample id is: $sample_id\n";
 print "sample name is: $sample_name\n";
+print "release date is: $release_date\n";
+print "update date is: $update_date\n";
 print "\n";
 
 my $groups = $sample->groups;
