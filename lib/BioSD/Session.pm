@@ -63,7 +63,10 @@ sub fetch_sample {
     my ( $self, $sample_id ) = @_;
 
     my $sample = $self->_cache( $sample_id );
-    return $sample if $sample;
+    if ($sample) {
+      return undef if !$sample->is_valid;
+      return $sample;
+    }
 
     $sample = BioSD::Sample->new( $sample_id, $self );
     return undef if !$sample->is_valid;
@@ -87,7 +90,10 @@ sub fetch_group {
     my ( $self, $group_id ) = @_;
 
     my $group = $self->_cache( $group_id );
-    return $group if $group;
+    if ($group) {
+      return undef if !$group->is_valid;
+      return $group
+    }
 
     $group = BioSD::Group->new( $group_id, $self );
     return undef if !$group->is_valid;
