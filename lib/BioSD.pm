@@ -77,7 +77,7 @@ require BioSD::Session;
 
 =cut
 
-our $root_url = 'http://www.ebi.ac.uk/biosamples/xml';
+our $root_url = 'https://www.ebi.ac.uk/biosamples/xml';
 
 =head2 BioSD::query_pagesize
 

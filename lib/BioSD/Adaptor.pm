@@ -43,7 +43,7 @@ my $ua = LWP::UserAgent->new;
 sub fetch_sample_element {
   my ($sample_id) = @_;
   confess('No sample ID provided') if !defined $sample_id;
-  my $location = "$BioSD::root_url/sample/$sample_id";
+  my $location = "$BioSD::root_url/samples/$sample_id";
   my $response = $ua->get($location);
   return _request_location( $location, qr/<BioSample/ );
 }
