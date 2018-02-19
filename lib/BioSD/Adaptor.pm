@@ -90,7 +90,7 @@ sub fetch_group_query_element {
 sub fetch_sample_query_element {
   my ( $query, $page ) = @_;
   confess('No query provided') if !defined $query;
-  my $location = "$BioSD::root_url/sample/query=";
+  my $location = "$BioSD::root_url/samples/query=";
   if ($query) {
     $query = URI::Escape::uri_escape($query);
     $query = URI::Escape::uri_escape($query);
