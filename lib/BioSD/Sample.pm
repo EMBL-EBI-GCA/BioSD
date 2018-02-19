@@ -25,11 +25,11 @@
 
 =head1 SYNOPSIS
 
-    my $sample = BioSD::Sample->new('SAME123456');
+    my $sample = BioSD::Sample->new('SAMEA123456');
 
     # check we have used a valid sample id
     if ($sample->is_valid) {
-      print 'BioSamples database contains a sample with id SAME123456';
+      print 'BioSamples database contains a sample with id SAMEA123456';
     }
 
     # get some information about the sample
@@ -63,8 +63,8 @@ require BioSD;
 
 =head new
 
-  Arg [1]    : string   sample id for the BioSamples database e.g. 'SAME123456'
-  Example    : $sample = BioSD::Sample->new('SAME123456');
+  Arg [1]    : string   sample id for the BioSamples database e.g. 'SAMEA123456'
+  Example    : $sample = BioSD::Sample->new('SAMEA123456');
   Description: Creates a new sample object.  A sample object will be created for
                any id, without initially checking if that id is present in the
                BioSamples database.  If the id is not valid, errors will be

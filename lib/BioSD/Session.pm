@@ -51,7 +51,7 @@ sub new {
 =head2 fetch_sample
 
   Arg [1]    : string   sample_id
-  Example    : $group = $session->fetch_sample('SAME123456');
+  Example    : $group = $session->fetch_sample('SAMEA123456');
   Description: Gets a sample object from the BioSamples database, or returns
                undef if sample id is not valid
   Returntype : BioSD::Sample or undef

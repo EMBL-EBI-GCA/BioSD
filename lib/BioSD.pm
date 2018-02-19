@@ -35,7 +35,7 @@ our $VERSION = '0.01';
 
     use BioSD;
 
-    my $sample = BioSD::fetch_sample('SAME123456');
+    my $sample = BioSD::fetch_sample('SAMEA123456');
     my $group = BioSD::fetch_group('SAMEG123456');
 
     my ($cancer_group) = @{BioSD::search_for_groups('cancer')};
@@ -116,7 +116,7 @@ our $session = BioSD::Session->new();
 =head2 fetch_sample
 
   Arg [1]    : string   sample_id
-  Example    : $group = BioSD::fetch_sample('SAME123456');
+  Example    : $group = BioSD::fetch_sample('SAMEA123456');
   Description: Gets a sample object from the BioSamples database, or returns
                undef if sample id is not valid
   Returntype : BioSD::Sample or undef

@@ -51,7 +51,7 @@ sub fetch_sample_element {
 sub fetch_group_element {
   my ($group_id) = @_;
   confess('No group ID provided') if !defined $group_id;
-  my $location = "$BioSD::root_url/group/$group_id";
+  my $location = "$BioSD::root_url/groups/$group_id";
   my $response = $ua->get($location);
   return _request_location( $location, qr/<BioSampleGroup/ );
 }
@@ -75,7 +75,7 @@ sub fetch_groupsamples_query_element {
 sub fetch_group_query_element {
   my ( $query, $page ) = @_;
   confess('No query provided') if !defined $query;
-  my $location = "$BioSD::root_url/group/query=";
+  my $location = "$BioSD::root_url/groups/query=";
   if ($query) {
     $query = URI::Escape::uri_escape($query);
     $query = URI::Escape::uri_escape($query);
